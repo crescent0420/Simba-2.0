@@ -97,34 +97,50 @@ nav{
 /* ── PAGE LAYOUT ── */
 .page{display:flex;min-height:calc(100vh - 62px);}
 
-/* ── FILTER BAR (replaces sidebar) ── */
-.filter-bar{
-  background:#fff;border-bottom:1px solid var(--border);
-  padding:0 3%;display:flex;align-items:center;gap:14px;
-  height:48px;overflow-x:auto;scrollbar-width:none;
+/* ── SIDEBAR ── */
+.sidebar{
+  width:210px;flex-shrink:0;padding:16px 14px;
+  border-right:1px solid var(--border);
+  position:sticky;top:62px;height:calc(100vh - 62px);
+  overflow-y:auto;background:#fff;
 }
-.filter-bar::-webkit-scrollbar{display:none;}
-.filter-bar-label{
-  font-size:11px;font-weight:700;color:var(--gray);
-  white-space:nowrap;letter-spacing:0.05em;text-transform:uppercase;
-  flex-shrink:0;
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(232,98,10,0.2);border-radius:4px;}
+.sb-title{
+  font-family:"Syne",sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--gray);
+  margin-bottom:8px;margin-top:4px;
 }
-.filter-bar .sort-select{
-  padding:5px 8px;border:1.5px solid var(--border);
-  border-radius:8px;font-family:"DM Sans",sans-serif;font-size:12px;
-  background:#fff;color:var(--black);outline:none;cursor:pointer;
-  flex-shrink:0;
+.cat-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 9px;border-radius:9px;cursor:pointer;
+  font-size:13px;font-weight:500;color:var(--gray);
+  transition:all 0.15s;border:none;background:none;
+  width:100%;text-align:left;font-family:"DM Sans",sans-serif;
+  margin-bottom:1px;
 }
-.filter-bar .sort-select:focus{border-color:var(--orange);}
-.filter-bar-sep{width:1px;height:22px;background:var(--border);flex-shrink:0;}
-.filter-bar .stock-row{display:flex;align-items:center;gap:7px;flex-shrink:0;}
-.filter-bar .filter-label{font-size:12px;font-weight:500;color:var(--gray);margin:0;white-space:nowrap;}
-.filter-bar .price-range{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.filter-bar input[type=range]{width:110px;accent-color:var(--orange);cursor:pointer;}
-.filter-bar .price-display{font-size:12px;font-weight:700;color:var(--orange);white-space:nowrap;}
+.cat-btn:hover{background:var(--orange-light);color:var(--orange);}
+.cat-btn.active{background:var(--orange);color:#fff;}
+.cat-emoji{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.cat-count-pill{
+  margin-left:auto;font-size:10px;font-weight:600;
+  background:rgba(0,0,0,0.06);border-radius:10px;padding:1px 6px;
+}
+.cat-btn.active .cat-count-pill{background:rgba(255,255,255,0.25);}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.filter-block{margin-bottom:14px;}
+.filter-label{font-size:11px;font-weight:600;color:var(--gray);margin-bottom:6px;display:block;}
+input[type=range]{width:100%;accent-color:var(--orange);cursor:pointer;}
+.price-display{font-size:12px;font-weight:700;color:var(--orange);margin-top:4px;}
 
 /* ── MAIN ── */
-.main{flex:1;padding:16px 3%;min-width:0;}
+.main{flex:1;padding:16px 18px;min-width:0;}
+.sort-select{
+  width:100%;padding:7px 9px;border:1.5px solid var(--border);
+  border-radius:8px;font-family:"DM Sans",sans-serif;font-size:12px;
+  background:#fff;color:var(--black);outline:none;cursor:pointer;
+}
+.sort-select:focus{border-color:var(--orange);}
 .mobile-chips{display:none;gap:7px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;}
 .mobile-chips::-webkit-scrollbar{display:none;}
 .chip{
@@ -200,13 +216,6 @@ nav{
 .add-btn:hover:not(:disabled){background:var(--orange-dark);}
 .add-btn.added{background:#10b981;}
 .add-btn:disabled{background:#ddd;color:#aaa;cursor:not-allowed;}
-
-.sort-select{
-  padding:7px 9px;border:1.5px solid var(--border);
-  border-radius:8px;font-family:"DM Sans",sans-serif;font-size:12px;
-  background:#fff;color:var(--black);outline:none;cursor:pointer;
-}
-.sort-select:focus{border-color:var(--orange);}
 
 /* ── TOGGLE ── */
 .toggle-wrap{position:relative;width:36px;height:20px;cursor:pointer;}
@@ -343,9 +352,10 @@ nav{
 
 /* ── DARK MODE ── */
 body.dark{background:#111;color:#eee;}
-body.dark nav,body.dark .filter-bar,body.dark .modal,body.dark .drawer{background:#1a1a1a;}
-body.dark .filter-bar{border-color:#2a2a2a;}
-body.dark .filter-bar .sort-select{background:#242424;color:#eee;border-color:#333;}
+body.dark nav,body.dark .sidebar,body.dark .modal,body.dark .drawer{background:#1a1a1a;}
+body.dark nav{background:rgba(26,26,26,0.97);}
+body.dark .sidebar{border-color:#2a2a2a;}
+body.dark .sort-select{background:#242424;color:#eee;border-color:#333;}
 body.dark nav{background:rgba(26,26,26,0.97);}
 body.dark .card{background:#1e1e1e;border-color:#2a2a2a;}
 body.dark .card-foot{border-color:#2a2a2a;}
@@ -358,11 +368,11 @@ body.dark .sidebar{border-color:#2a2a2a;}
 
 /* ── RESPONSIVE ── */
 @media(max-width:820px){
+  .sidebar{display:none;}
   .mobile-chips{display:flex;}
   .mobile-bar{display:flex;}
   .grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));}
   .lang-grp{display:none;}
-  .filter-bar{gap:10px;}
 }
 @media(max-width:480px){
   nav{padding:0 3%;}
@@ -520,33 +530,39 @@ body.dark .cat-tab{background:#1e1e1e;border-color:#333;color:#ccc;}
   <button class="ai-clear" onclick="clearAI()">✕ Clear</button>
 </div>
 
-<!-- FILTER BAR -->
-<div class="filter-bar">
-  <span class="filter-bar-label">Sort</span>
-  <select id="sortSelect" class="sort-select" onchange="applyFilters()">
-    <option value="featured" data-t="sort_featured">Featured</option>
-    <option value="price_asc" data-t="sort_low">Price: Low to High</option>
-    <option value="price_desc" data-t="sort_high">Price: High to Low</option>
-    <option value="name" data-t="sort_name">Name A–Z</option>
-  </select>
-  <div class="filter-bar-sep"></div>
-  <div class="stock-row" style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
-    <label class="filter-bar-label" style="margin:0;text-transform:none;letter-spacing:0" data-t="in_stock_only">In Stock Only</label>
-    <label class="toggle-wrap">
-      <input type="checkbox" id="stockToggle" onchange="applyFilters()"/>
-      <span class="toggle-track"></span>
-    </label>
-  </div>
-  <div class="filter-bar-sep"></div>
-  <div class="price-range" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-    <span class="filter-bar-label" style="text-transform:none;letter-spacing:0" data-t="max_price">Max Price</span>
-    <input type="range" id="priceSlider" min="0" max="750000" step="500" value="750000"
-      oninput="applyFilters();updatePriceLabel()" style="width:110px;accent-color:var(--orange);cursor:pointer;"/>
-    <div id="priceDisplay" class="price-display">750,000 RWF</div>
-  </div>
-</div>
-
 <div class="page">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-title" data-t="filters">Filters</div>
+
+    <div class="filter-block">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <label class="filter-label" style="margin:0" data-t="in_stock_only">In Stock Only</label>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="stockToggle" onchange="applyFilters()"/>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="filter-block">
+      <label class="filter-label" data-t="max_price">Max Price</label>
+      <input type="range" id="priceSlider" min="0" max="750000" step="500" value="750000"
+        oninput="applyFilters();updatePriceLabel()"/>
+      <div id="priceDisplay" class="price-display">Up to 750,000 RWF</div>
+    </div>
+
+    <div class="filter-block">
+      <label class="filter-label" data-t="sort_by">Sort by</label>
+      <select id="sortSelect" class="sort-select" onchange="applyFilters()">
+        <option value="featured" data-t="sort_featured">Featured</option>
+        <option value="price_asc" data-t="sort_low">Price: Low to High</option>
+        <option value="price_desc" data-t="sort_high">Price: High to Low</option>
+        <option value="name" data-t="sort_name">Name A–Z</option>
+      </select>
+    </div>
+  </aside>
+
   <!-- MAIN -->
   <main class="main">
     <!-- Mobile chips -->
@@ -1532,8 +1548,6 @@ function applyTranslations(){
     if(v) el.textContent = v;
   });
   document.getElementById("searchInput").placeholder = tr("search_ph");
-  // price slider max
-  document.getElementById("priceSlider").max = MAX_PRICE;
 }
 
 function setLang(l){
@@ -1559,6 +1573,7 @@ function buildCats(){
   CATS.forEach(cat=>{
     const icon  = CAT_ICONS[cat]||"📦";
     const label = labels[cat]||cat;
+    const cnt   = catCount(cat);
     const act   = cat===selCat;
     // chip
     const c = document.createElement("button");
@@ -1581,7 +1596,22 @@ function pickCat(cat){
   selCat=cat; aiIDs=null; searchTerm="";
   document.getElementById("searchInput").value="";
   document.getElementById("aiBar").classList.remove("show");
+  // Update price slider max to match category
+  updateCatPriceRange();
   buildCats(); applyFilters();
+  // Sync hero
+  heroFocusCat(cat);
+}
+
+function updateCatPriceRange(){
+  const prods = selCat==="All" ? PRODUCTS : PRODUCTS.filter(p=>p.category===selCat);
+  const catMax = prods.length ? Math.max(...prods.map(p=>p.price)) : MAX_PRICE;
+  const slider = document.getElementById("priceSlider");
+  // Only reset value if current value exceeds new max
+  slider.max = catMax;
+  if(Number(slider.value) > catMax) slider.value = catMax;
+  maxPrice = Number(slider.value);
+  updatePriceLabel();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1606,16 +1636,20 @@ function applyFilters(){
 }
 function updatePriceLabel(){
   const v = Number(document.getElementById("priceSlider").value);
-  document.getElementById("priceDisplay").textContent = `Up to ${fmt(v)} RWF`;
+  const max = Number(document.getElementById("priceSlider").max);
+  document.getElementById("priceDisplay").textContent = v>=max ? `${fmt(v)} RWF` : `Up to ${fmt(v)} RWF`;
 }
 function clearAll(){
   selCat="All"; aiIDs=null; searchTerm="";
   document.getElementById("stockToggle").checked=false;
-  document.getElementById("priceSlider").value=MAX_PRICE;
+  const slider=document.getElementById("priceSlider");
+  slider.max=MAX_PRICE; slider.value=MAX_PRICE;
   document.getElementById("sortSelect").value="featured";
   document.getElementById("searchInput").value="";
   document.getElementById("aiBar").classList.remove("show");
+  updatePriceLabel();
   buildCats(); applyFilters();
+  heroFocusCat("All");
 }
 function clearAI(){ aiIDs=null; document.getElementById("aiBar").classList.remove("show"); applyFilters(); }
 
@@ -1937,6 +1971,37 @@ function heroMove(dir){ heroGoTo(heroIdx+dir); }
 function heroStartTimer(){
   clearInterval(heroTimer);
   heroTimer = setInterval(()=>heroGoTo(heroIdx+1), 5000);
+}
+
+// Jump hero to the slide matching the selected category; stop slideshow unless "All"
+function heroFocusCat(cat){
+  if(cat==="All"){
+    // Resume slideshow from current slide
+    heroStartTimer();
+    // Show arrows + dots
+    document.querySelector(".hero-arrow.prev").style.display="";
+    document.querySelector(".hero-arrow.next").style.display="";
+    document.getElementById("heroDots").style.display="";
+    return;
+  }
+  // Find matching slide index
+  const idx = HERO_SLIDES.findIndex(s=>s.cat===cat);
+  if(idx<0) return;
+  // Stop slideshow
+  clearInterval(heroTimer);
+  // Hide arrows and dots (locked to this category slide)
+  document.querySelector(".hero-arrow.prev").style.display="none";
+  document.querySelector(".hero-arrow.next").style.display="none";
+  document.getElementById("heroDots").style.display="none";
+  // Jump to that slide
+  const slides = document.querySelectorAll(".hero-slide");
+  const dots   = document.querySelectorAll(".hero-dot");
+  slides[heroIdx].classList.remove("active");
+  if(dots[heroIdx]) dots[heroIdx].classList.remove("active");
+  heroIdx = idx;
+  slides[heroIdx].classList.add("active");
+  if(dots[heroIdx]) dots[heroIdx].classList.add("active");
+  document.getElementById("heroSlides").style.transform = `translateX(-${heroIdx*100}%)`;
 }
 
 // ═══════════════════════════════════════════════════
