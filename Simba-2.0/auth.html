@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign In — Simba 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--orange:#E8620A;--orange-dark:#c04f06;--orange-light:#fff3eb;--black:#0e0c0a;--white:#fffcf8;--gray:#6b6560;--gray-light:#f5f2ee;--green:#0a6e3f;--red:#dc2626;}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── LAYOUT ── */
+.auth-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+
+/* ── LEFT PANEL ── */
+.auth-left{
+  background:var(--black);
+  padding:48px;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.auth-left::before{
+  content:'';position:absolute;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,98,10,0.18),transparent 70%);
+  top:-100px;right:-100px;pointer-events:none;
+}
+.auth-left::after{
+  content:'';position:absolute;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,98,10,0.1),transparent 70%);
+  bottom:-50px;left:-50px;pointer-events:none;
+}
+.auth-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:auto;}
+.auth-logo-img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:3px solid var(--orange);flex-shrink:0;}
+.auth-logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:white;}
+.auth-logo-text span{color:var(--orange);}
+.auth-left-content{position:relative;z-index:1;margin-top:auto;padding-bottom:24px;}
+.auth-left-content h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3vw,42px);font-weight:800;color:white;line-height:1.1;margin-bottom:16px;}
+.auth-left-content h2 em{font-style:normal;color:var(--orange);}
+.auth-left-content p{font-size:16px;color:#888;line-height:1.7;margin-bottom:32px;}
+.auth-feature{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.auth-feature-icon{width:36px;height:36px;background:rgba(232,98,10,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.auth-feature p{font-size:14px;color:#aaa;}
+.auth-feature strong{color:white;display:block;font-size:14px;margin-bottom:1px;}
+
+/* ── RIGHT PANEL ── */
+.auth-right{
+  padding:48px;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  background:var(--white);
+  max-height:100vh;
+  overflow-y:auto;
+}
+.auth-right-inner{max-width:400px;width:100%;margin:0 auto;}
+
+/* ── TABS ── */
+.auth-tabs{display:flex;gap:4px;background:var(--gray-light);border-radius:14px;padding:4px;margin-bottom:32px;}
+.auth-tab{flex:1;padding:10px;border-radius:10px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--gray);cursor:pointer;transition:all 0.2s;}
+.auth-tab.active{background:white;color:var(--black);font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+
+/* ── FORM ── */
+.auth-form{display:none;}
+.auth-form.active{display:block;animation:fadeUp 0.3s ease;}
+.auth-form h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px;}
+.auth-form p.subtitle{font-size:14px;color:var(--gray);margin-bottom:28px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--black);margin-bottom:6px;}
+.form-input{
+  width:100%;padding:12px 14px;
+  border:1.5px solid rgba(14,12,10,0.12);
+  border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:15px;
+  background:white;color:var(--black);
+  transition:all 0.2s;outline:none;
+}
+.form-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,98,10,0.1);}
+.form-input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,0.1);}
+.form-input.success{border-color:var(--green);box-shadow:0 0 0 3px rgba(10,110,63,0.1);}
+.input-wrap{position:relative;}
+.input-wrap .form-input{padding-right:44px;}
+.input-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray);}
+.form-error{font-size:12px;color:var(--red);margin-top:5px;display:none;}
+.form-error.show{display:block;}
+.form-hint{font-size:12px;color:var(--gray);margin-top:5px;}
+
+/* Password strength */
+.pw-strength{margin-top:8px;display:none;}
+.pw-strength.show{display:block;}
+.pw-bars{display:flex;gap:4px;margin-bottom:4px;}
+.pw-bar{height:3px;flex:1;border-radius:2px;background:var(--gray-light);transition:all 0.3s;}
+.pw-bar.weak{background:#dc2626;}
+.pw-bar.fair{background:#f59e0b;}
+.pw-bar.good{background:#10b981;}
+.pw-label{font-size:11px;color:var(--gray);}
+
+.btn-full{
+  width:100%;padding:13px;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;border:none;transition:all 0.25s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-orange-full{background:var(--orange);color:white;box-shadow:0 4px 16px rgba(232,98,10,0.25);}
+.btn-orange-full:hover{background:var(--orange-dark);transform:translateY(-1px);}
+.btn-orange-full:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;transform:none;}
+.btn-google{background:white;color:var(--black);border:1.5px solid rgba(14,12,10,0.12);margin-bottom:16px;}
+.btn-google:hover{border-color:rgba(14,12,10,0.25);box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(14,12,10,0.1);}
+.divider span{font-size:12px;color:var(--gray);white-space:nowrap;}
+
+.auth-switch{text-align:center;font-size:13px;color:var(--gray);margin-top:20px;}
+.auth-switch a{color:var(--orange);font-weight:600;text-decoration:none;cursor:pointer;}
+.auth-switch a:hover{text-decoration:underline;}
+
+.forgot-link{display:block;text-align:right;font-size:12px;color:var(--orange);text-decoration:none;margin-top:-8px;margin-bottom:16px;cursor:pointer;font-weight:500;}
+.forgot-link:hover{text-decoration:underline;}
+
+/* Alert box */
+.alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;align-items:flex-start;gap:8px;}
+.alert.show{display:flex;}
+.alert-success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+.alert-error{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+.alert-info{background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
+
+/* Spinner */
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+.spinner.show{display:inline-block;}
+
+/* Lang switcher */
+.lang-bar{display:flex;justify-content:flex-end;gap:6px;margin-bottom:24px;}
+.lang-btn{background:none;border:1.5px solid transparent;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:500;color:var(--gray);cursor:pointer;transition:all 0.2s;}
+.lang-btn.active{border-color:var(--orange);color:var(--orange);}
+
+/* Reset form extras */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--gray);cursor:pointer;margin-bottom:20px;text-decoration:none;}
+.back-link:hover{color:var(--orange);}
+.reset-sent{text-align:center;padding:20px 0;display:none;}
+.reset-sent.show{display:block;}
+.reset-sent .big-icon{font-size:56px;margin-bottom:16px;}
+.reset-sent h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+.reset-sent p{font-size:14px;color:var(--gray);line-height:1.6;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:768px){
+  .auth-wrap{grid-template-columns:1fr;}
+  .auth-left{display:none;}
+  .auth-right{padding:32px 24px;max-height:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+
+  <!-- ── LEFT ─────────────────────────────────────────────── -->
+  <div class="auth-left">
+    <a href="index.html" class="auth-logo">
+      <img src="data:image/png;base64,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" alt="Simba Supermarket" class="auth-logo-img"/>
+      <span class="auth-logo-text">Simba <span>2.0</span></span>
+    </a>
+    <div class="auth-left-content">
+      <h2>Shop smarter,<br/>pick up <em>faster.</em></h2>
+      <p>Join thousands of Kigali families who order from Simba Supermarket online — pay with MoMo, pick up in 45 minutes.</p>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">🛒</div>
+        <div><strong data-t="feat1_title">552 Products</strong><p data-t="feat1_desc">Food, drinks, beauty, electronics and more</p></div>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">📍</div>
+        <div><strong data-t="feat2_title">9 Kigali Branches</strong><p data-t="feat2_desc">Remera, Kimironko, Kacyiru and 6 more</p></div>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">📱</div>
+        <div><strong data-t="feat3_title">MTN MoMo Payment</strong><p data-t="feat3_desc">Fast, secure, no cash needed</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT ─────────────────────────────────────────────── -->
+  <div class="auth-right">
+    <div class="auth-right-inner">
+
+      <div class="lang-bar">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" onclick="setLang('rw')">RW</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showTab('login')" data-t="tab_login">Sign In</button>
+        <button class="auth-tab" onclick="showTab('register')" data-t="tab_register">Register</button>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div id="form-login" class="auth-form active">
+        <h2 data-t="login_title">Welcome back 👋</h2>
+        <p class="subtitle" data-t="login_sub">Sign in to your Simba account</p>
+
+        <div class="alert alert-error" id="login-error">
+          <span>⚠️</span><span id="login-error-msg"></span>
+        </div>
+
+        <button class="btn-full btn-google" onclick="handleGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.566 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          <span data-t="btn_google">Continue with Google</span>
+        </button>
+
+        <div class="divider"><span data-t="or">or sign in with email</span></div>
+
+        <div class="form-group">
+          <label class="form-label" data-t="label_email">Email address</label>
+          <input type="email" id="login-email" class="form-input" placeholder="you@example.com" data-ph="ph_email"/>
+          <span class="form-error" id="login-email-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" data-ph="ph_password"/>
+            <button class="input-toggle" onclick="togglePw('login-password',this)" type="button">👁</button>
+          </div>
+          <span class="form-error" id="login-pw-err"></span>
+        </div>
+        <a class="forgot-link" onclick="showTab('forgot')" data-t="forgot_link">Forgot password?</a>
+
+        <button class="btn-full btn-orange-full" onclick="handleLogin()" id="login-btn">
+          <div class="spinner" id="login-spinner"></div>
+          <span data-t="btn_login">Sign In</span>
+        </button>
+
+        <p class="auth-switch" data-t="switch_to_register">
+          Don't have an account? <a onclick="showTab('register')">Register</a>
+        </p>
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div id="form-register" class="auth-form">
+        <h2 data-t="register_title">Create account 🦁</h2>
+        <p class="subtitle" data-t="register_sub">Join Simba 2.0 — it's free</p>
+
+        <div class="alert alert-error" id="register-error">
+          <span>⚠️</span><span id="register-error-msg"></span>
+        </div>
+        <div class="alert alert-success" id="register-success">
+          <span>✅</span><span data-t="register_success_msg">Account created! Redirecting to shop...</span>
+        </div>
+
+        <button class="btn-full btn-google" onclick="handleGoogle()" style="margin-bottom:16px;">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.566 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          <span data-t="btn_google">Continue with Google</span>
+        </button>
+
+        <div class="divider"><span data-t="or_register">or register with email</span></div>
+
+        <div class="form-group">
+          <label class="form-label" data-t="label_fullname">Full Name</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="Jean-Paul Habimana" data-ph="ph_name"/>
+          <span class="form-error" id="reg-name-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_email">Email address</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" data-ph="ph_email"/>
+          <span class="form-error" id="reg-email-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_phone">Phone (MTN MoMo)</label>
+          <input type="tel" id="reg-phone" class="form-input" placeholder="078 123 4567" data-ph="ph_phone"/>
+          <span class="form-error" id="reg-phone-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="reg-password" class="form-input" placeholder="At least 6 characters" data-ph="ph_pw_hint" oninput="checkPwStrength(this.value)"/>
+            <button class="input-toggle" onclick="togglePw('reg-password',this)" type="button">👁</button>
+          </div>
+          <div class="pw-strength" id="pw-strength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
+              <div class="pw-bar" id="bar4"></div>
+            </div>
+            <span class="pw-label" id="pw-label"></span>
+          </div>
+          <span class="form-error" id="reg-pw-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_confirm_pw">Confirm Password</label>
+          <div class="input-wrap">
+            <input type="password" id="reg-confirm" class="form-input" placeholder="••••••••" data-ph="ph_password"/>
+            <button class="input-toggle" onclick="togglePw('reg-confirm',this)" type="button">👁</button>
+          </div>
+          <span class="form-error" id="reg-confirm-err"></span>
+        </div>
+
+        <button class="btn-full btn-orange-full" onclick="handleRegister()" id="reg-btn">
+          <div class="spinner" id="reg-spinner"></div>
+          <span data-t="btn_register">Create Account</span>
+        </button>
+
+        <p class="auth-switch" data-t="switch_to_login">
+          Already have an account? <a onclick="showTab('login')">Sign In</a>
+        </p>
+      </div>
+
+      <!-- ── FORGOT PASSWORD FORM ── -->
+      <div id="form-forgot" class="auth-form">
+        <a class="back-link" onclick="showTab('login')">← <span data-t="back_to_login">Back to Sign In</span></a>
+        <h2 data-t="forgot_title">Reset Password 🔑</h2>
+        <p class="subtitle" data-t="forgot_sub">Enter your email and we'll send you a reset link.</p>
+
+        <div id="reset-form-inner">
+          <div class="alert alert-error" id="forgot-error">
+            <span>⚠️</span><span id="forgot-error-msg"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-t="label_email">Email address</label>
+            <input type="email" id="forgot-email" class="form-input" placeholder="you@example.com" data-ph="ph_email"/>
+            <span class="form-error" id="forgot-email-err"></span>
+          </div>
+          <button class="btn-full btn-orange-full" onclick="handleForgot()" id="forgot-btn">
+            <div class="spinner" id="forgot-spinner"></div>
+            <span data-t="btn_send_reset">Send Reset Link</span>
+          </button>
+        </div>
+
+        <div class="reset-sent" id="reset-sent">
+          <div class="big-icon">📬</div>
+          <h3 data-t="reset_sent_title">Check your inbox!</h3>
+          <p data-t="reset_sent_msg">We sent a password reset link to your email. Check your spam folder if you don't see it.</p>
+          <br/>
+          <a class="back-link" onclick="showTab('login')" style="justify-content:center;">← <span data-t="back_to_login">Back to Sign In</span></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Translations ──────────────────────────────────────────────
+const T = {
+  en: {
+    tab_login:"Sign In", tab_register:"Register",
+    login_title:"Welcome back 👋", login_sub:"Sign in to your Simba account",
+    register_title:"Create account 🦁", register_sub:"Join Simba 2.0 — it's free",
+    forgot_title:"Reset Password 🔑", forgot_sub:"Enter your email and we'll send you a reset link.",
+    feat1_title:"552 Products", feat1_desc:"Food, drinks, beauty, electronics and more",
+    feat2_title:"9 Kigali Branches", feat2_desc:"Remera, Kimironko, Kacyiru and 6 more",
+    feat3_title:"MTN MoMo Payment", feat3_desc:"Fast, secure, no cash needed",
+    label_email:"Email address", label_password:"Password", label_fullname:"Full Name",
+    label_phone:"Phone (MTN MoMo)", label_confirm_pw:"Confirm Password",
+    btn_google:"Continue with Google", btn_login:"Sign In", btn_register:"Create Account",
+    btn_send_reset:"Send Reset Link",
+    or:"or sign in with email", or_register:"or register with email",
+    forgot_link:"Forgot password?",
+    switch_to_register:"Don't have an account? <a onclick=\"showTab('register')\">Register</a>",
+    switch_to_login:"Already have an account? <a onclick=\"showTab('login')\">Sign In</a>",
+    back_to_login:"Back to Sign In",
+    reset_sent_title:"Check your inbox!",
+    reset_sent_msg:"We sent a password reset link to your email. Check your spam folder if you don't see it.",
+    register_success_msg:"Account created! Redirecting to shop...",
+    err_required:"This field is required",
+    err_email:"Please enter a valid email",
+    err_pw_short:"Password must be at least 6 characters",
+    err_pw_match:"Passwords do not match",
+    err_phone:"Enter a valid Rwandan phone number",
+    err_login:"Invalid email or password. Please try again.",
+    err_email_exists:"An account with this email already exists.",
+    err_google:"Google sign-in is not configured yet.",
+    ph_email:"you@example.com", ph_password:"••••••••",
+    ph_name:"Jean-Paul Habimana", ph_phone:"078 123 4567", ph_pw_hint:"At least 6 characters",
+    pw_weak:"Weak", pw_fair:"Fair", pw_good:"Good", pw_strong:"Strong",
+  },
+  fr: {
+    tab_login:"Connexion", tab_register:"S'inscrire",
+    login_title:"Bon retour 👋", login_sub:"Connectez-vous à votre compte Simba",
+    register_title:"Créer un compte 🦁", register_sub:"Rejoignez Simba 2.0 — c'est gratuit",
+    forgot_title:"Réinitialiser le mot de passe 🔑", forgot_sub:"Entrez votre email et nous vous enverrons un lien.",
+    feat1_title:"552 Produits", feat1_desc:"Alimentation, boissons, beauté, électronique et plus",
+    feat2_title:"9 Agences à Kigali", feat2_desc:"Remera, Kimironko, Kacyiru et 6 autres",
+    feat3_title:"Paiement MTN MoMo", feat3_desc:"Rapide, sécurisé, sans espèces",
+    label_email:"Adresse email", label_password:"Mot de passe", label_fullname:"Nom complet",
+    label_phone:"Téléphone (MTN MoMo)", label_confirm_pw:"Confirmer le mot de passe",
+    btn_google:"Continuer avec Google", btn_login:"Se connecter", btn_register:"Créer un compte",
+    btn_send_reset:"Envoyer le lien",
+    or:"ou se connecter avec email", or_register:"ou s'inscrire avec email",
+    forgot_link:"Mot de passe oublié ?",
+    switch_to_register:"Pas de compte ? <a onclick=\"showTab('register')\">S'inscrire</a>",
+    switch_to_login:"Déjà un compte ? <a onclick=\"showTab('login')\">Se connecter</a>",
+    back_to_login:"Retour à la connexion",
+    reset_sent_title:"Vérifiez votre boîte mail !",
+    reset_sent_msg:"Nous avons envoyé un lien de réinitialisation à votre email.",
+    register_success_msg:"Compte créé ! Redirection vers la boutique...",
+    err_required:"Ce champ est obligatoire",
+    err_email:"Veuillez entrer un email valide",
+    err_pw_short:"Le mot de passe doit contenir au moins 6 caractères",
+    err_pw_match:"Les mots de passe ne correspondent pas",
+    err_phone:"Entrez un numéro de téléphone rwandais valide",
+    err_login:"Email ou mot de passe invalide.",
+    err_email_exists:"Un compte avec cet email existe déjà.",
+    err_google:"La connexion Google n'est pas encore configurée.",
+    ph_email:"vous@exemple.com", ph_password:"••••••••",
+    ph_name:"Jean-Paul Habimana", ph_phone:"078 123 4567", ph_pw_hint:"Au moins 6 caractères",
+    pw_weak:"Faible", pw_fair:"Moyen", pw_good:"Bon", pw_strong:"Fort",
+  },
+  rw: {
+    tab_login:"Injira", tab_register:"Iyandikishe",
+    login_title:"Murakaza neza 👋", login_sub:"Injira muri konti yawe ya Simba",
+    register_title:"Fungura konti 🦁", register_sub:"Injira muri Simba 2.0 — ubuntu",
+    forgot_title:"Hindura Ijambo Banga 🔑", forgot_sub:"Injiza imeli yawe tukuhereze uhuza.",
+    feat1_title:"Ibicuruzwa 552", feat1_desc:"Ibiribwa, inzoga, isuku, ikoranabuhanga n'ibindi",
+    feat2_title:"Amashami 9 i Kigali", feat2_desc:"Remera, Kimironko, Kacyiru n'andi 6",
+    feat3_title:"Kwishyura na MTN MoMo", feat3_desc:"Byihuta, biramutse, nta faranga bikeneye",
+    label_email:"Imeli", label_password:"Ijambo banga", label_fullname:"Amazina yose",
+    label_phone:"Telefoni (MTN MoMo)", label_confirm_pw:"Emeza ijambo banga",
+    btn_google:"Komeza na Google", btn_login:"Injira", btn_register:"Fungura Konti",
+    btn_send_reset:"Ohereza Uhuza",
+    or:"cyangwa injira na imeli", or_register:"cyangwa iyandikishe na imeli",
+    forgot_link:"Wibagiwe ijambo banga?",
+    switch_to_register:"Nta konti? <a onclick=\"showTab('register')\">Iyandikishe</a>",
+    switch_to_login:"Usanzwe ufite konti? <a onclick=\"showTab('login')\">Injira</a>",
+    back_to_login:"Garuka Injira",
+    reset_sent_title:"Reba imeli yawe!",
+    reset_sent_msg:"Twohereje uhuza wo guhindura ijambo banga kuri imeli yawe.",
+    register_success_msg:"Konti yafunguwe! Ugiye ku isoko...",
+    err_required:"Iki gice ni ngombwa",
+    err_email:"Injiza imeli nyayo",
+    err_pw_short:"Ijambo banga rigomba kuba rifite inyuguti 6 nibura",
+    err_pw_match:"Amagambo banga ntahuye",
+    err_phone:"Injiza numero ya telefoni y'u Rwanda",
+    err_login:"Imeli cyangwa ijambo banga ntabwo ari ryo.",
+    err_email_exists:"Konti ifite iyi imeli isanzwe ihari.",
+    err_google:"Injira na Google ntikora ubu.",
+    ph_email:"wowe@urugero.com", ph_password:"••••••••",
+    ph_name:"Jean-Paul Habimana", ph_phone:"078 123 4567", ph_pw_hint:"Inyuguti 6 nibura",
+    pw_weak:"Nke", pw_fair:"Hagati", pw_good:"Nziza", pw_strong:"Cyane",
+  }
+};
+
+let lang = localStorage.getItem('simba_lang') || 'en';
+
+function t(key){ return T[lang][key] || key; }
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('simba_lang', l);
+  applyT();
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l.toUpperCase()));
+}
+
+function applyT() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (T[lang][key] !== undefined) el.innerHTML = T[lang][key];
+  });
+  // Update placeholders
+  document.querySelectorAll('[data-ph]').forEach(el => {
+    const key = el.getAttribute('data-ph');
+    if (T[lang][key]) el.placeholder = T[lang][key];
+  });
+}
+
+// ── Tab switching ──────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('form-' + name).classList.add('active');
+  if (name === 'login') document.querySelectorAll('.auth-tab')[0].classList.add('active');
+  if (name === 'register') document.querySelectorAll('.auth-tab')[1].classList.add('active');
+  clearErrors();
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function clearErrors() {
+  document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.alert').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.form-input').forEach(e => { e.classList.remove('error','success'); });
+}
+function setInputState(id, state) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('error','success'); if (state) el.classList.add(state); }
+}
+function setAlert(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('show', show);
+}
+function setLoading(btnId, spinnerId, loading) {
+  const btn = document.getElementById(btnId);
+  const sp = document.getElementById(spinnerId);
+  if (btn) btn.disabled = loading;
+  if (sp) sp.classList.toggle('show', loading);
+}
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+// ── Password strength ──────────────────────────────────────────
+function checkPwStrength(pw) {
+  const strength = document.getElementById('pw-strength');
+  const label = document.getElementById('pw-label');
+  const bars = [1,2,3,4].map(i => document.getElementById('bar'+i));
+  if (!pw) { strength.classList.remove('show'); return; }
+  strength.classList.add('show');
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = ['weak','fair','good','good'];
+  const labels = [t('pw_weak'), t('pw_fair'), t('pw_good'), t('pw_strong')];
+  bars.forEach((b, i) => {
+    b.className = 'pw-bar';
+    if (i < score) b.classList.add(levels[score-1]);
+  });
+  label.textContent = labels[score-1] || '';
+}
+
+// ── Validation ─────────────────────────────────────────────────
+function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function validatePhone(phone) { return /^07[2-9]\s?\d{3}\s?\d{4}$/.test(phone.replace(/\s/g,'')); }
+
+// ── LOGIN ──────────────────────────────────────────────────────
+async function handleLogin() {
+  clearErrors();
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-password').value;
+  let valid = true;
+
+  if (!email) { showError('login-email-err', t('err_required')); setInputState('login-email','error'); valid = false; }
+  else if (!validateEmail(email)) { showError('login-email-err', t('err_email')); setInputState('login-email','error'); valid = false; }
+  if (!pw) { showError('login-pw-err', t('err_required')); setInputState('login-password','error'); valid = false; }
+  if (!valid) return;
+
+  setLoading('login-btn','login-spinner',true);
+
+  try {
+    const res = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username: email, password: pw })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem('simba_token', data.access);
+      localStorage.setItem('simba_refresh', data.refresh);
+      // Try to get user profile
+      try {
+        const me = await fetch('http://127.0.0.1:8000/api/auth/me/', {
+          headers:{ 'Authorization': 'Bearer ' + data.access }
+        });
+        const user = await me.json();
+        localStorage.setItem('simba_user', JSON.stringify(user));
+      } catch(e){}
+      setInputState('login-email','success');
+      setInputState('login-password','success');
+      setTimeout(() => window.location.href = 'shop.html', 600);
+    } else {
+      document.getElementById('login-error-msg').textContent = t('err_login');
+      setAlert('login-error', true);
+      setInputState('login-email','error');
+      setInputState('login-password','error');
+    }
+  } catch(e) {
+    // Fallback: local auth for demo
+    const users = JSON.parse(localStorage.getItem('simba_users') || '[]');
+    const user = users.find(u => u.email === email && u.password === btoa(pw));
+    if (user) {
+      localStorage.setItem('simba_user', JSON.stringify(user));
+      localStorage.setItem('simba_token', 'demo_token_' + Date.now());
+      setTimeout(() => window.location.href = 'shop.html', 600);
+    } else {
+      document.getElementById('login-error-msg').textContent = t('err_login');
+      setAlert('login-error', true);
+      setInputState('login-email','error');
+      setInputState('login-password','error');
+    }
+  } finally {
+    setLoading('login-btn','login-spinner',false);
+  }
+}
+
+// ── REGISTER ───────────────────────────────────────────────────
+async function handleRegister() {
+  clearErrors();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const pw = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-confirm').value;
+  let valid = true;
+
+  if (!name) { showError('reg-name-err', t('err_required')); setInputState('reg-name','error'); valid = false; }
+  if (!email) { showError('reg-email-err', t('err_required')); setInputState('reg-email','error'); valid = false; }
+  else if (!validateEmail(email)) { showError('reg-email-err', t('err_email')); setInputState('reg-email','error'); valid = false; }
+  if (!phone) { showError('reg-phone-err', t('err_required')); setInputState('reg-phone','error'); valid = false; }
+  else if (!validatePhone(phone)) { showError('reg-phone-err', t('err_phone')); setInputState('reg-phone','error'); valid = false; }
+  if (!pw) { showError('reg-pw-err', t('err_required')); setInputState('reg-password','error'); valid = false; }
+  else if (pw.length < 6) { showError('reg-pw-err', t('err_pw_short')); setInputState('reg-password','error'); valid = false; }
+  if (pw !== confirm) { showError('reg-confirm-err', t('err_pw_match')); setInputState('reg-confirm','error'); valid = false; }
+  if (!valid) return;
+
+  setLoading('reg-btn','reg-spinner',true);
+
+  // Username = first part of email
+  const username = email.split('@')[0].replace(/[^a-zA-Z0-9]/g,'') + Math.floor(Math.random()*100);
+
+  try {
+    const res = await fetch('http://127.0.0.1:8000/api/auth/register/', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username, email, password: pw, phone })
+    });
+    const data = await res.json();
+
+    if (res.ok || res.status === 201) {
+      // Auto login
+      const loginRes = await fetch('http://127.0.0.1:8000/api/auth/login/', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ username, password: pw })
+      });
+      const loginData = await loginRes.json();
+      if (loginRes.ok) {
+        localStorage.setItem('simba_token', loginData.access);
+        localStorage.setItem('simba_user', JSON.stringify({ username, email, phone }));
+      }
+      setAlert('register-success', true);
+      setTimeout(() => window.location.href = 'shop.html', 1500);
+    } else {
+      const msg = data.email ? t('err_email_exists') : (data.username || Object.values(data)[0] || t('err_login'));
+      document.getElementById('register-error-msg').textContent = Array.isArray(msg) ? msg[0] : msg;
+      setAlert('register-error', true);
+    }
+  } catch(e) {
+    // Local fallback
+    const users = JSON.parse(localStorage.getItem('simba_users') || '[]');
+    if (users.find(u => u.email === email)) {
+      document.getElementById('register-error-msg').textContent = t('err_email_exists');
+      setAlert('register-error', true);
+    } else {
+      users.push({ username, email, phone, password: btoa(pw), name });
+      localStorage.setItem('simba_users', JSON.stringify(users));
+      localStorage.setItem('simba_user', JSON.stringify({ username, email, phone, name }));
+      localStorage.setItem('simba_token', 'demo_token_' + Date.now());
+      setAlert('register-success', true);
+      setTimeout(() => window.location.href = 'shop.html', 1500);
+    }
+  } finally {
+    setLoading('reg-btn','reg-spinner',false);
+  }
+}
+
+// ── FORGOT PASSWORD ────────────────────────────────────────────
+async function handleForgot() {
+  clearErrors();
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { showError('forgot-email-err', t('err_required')); setInputState('forgot-email','error'); return; }
+  if (!validateEmail(email)) { showError('forgot-email-err', t('err_email')); setInputState('forgot-email','error'); return; }
+
+  setLoading('forgot-btn','forgot-spinner',true);
+  // Simulate sending email (real: integrate Resend API)
+  await new Promise(r => setTimeout(r, 1500));
+  setLoading('forgot-btn','forgot-spinner',false);
+  document.getElementById('reset-form-inner').style.display = 'none';
+  document.getElementById('reset-sent').classList.add('show');
+}
+
+// ── GOOGLE (stub) ──────────────────────────────────────────────
+function handleGoogle() {
+  alert(t('err_google') + '\n\nTo enable: add Google OAuth credentials in settings.');
+}
+
+// ── Enter key support ──────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = document.querySelector('.auth-form.active');
+  if (!active) return;
+  if (active.id === 'form-login') handleLogin();
+  if (active.id === 'form-register') handleRegister();
+  if (active.id === 'form-forgot') handleForgot();
+});
+
+// ── Check URL params (e.g. ?tab=register) ─────────────────────
+const urlTab = new URLSearchParams(window.location.search).get('tab');
+if (urlTab) showTab(urlTab);
+
+// ── Init ───────────────────────────────────────────────────────
+applyT();
+document.querySelectorAll('.lang-btn').forEach(b => {
+  b.classList.toggle('active', b.textContent === lang.toUpperCase());
+});
+
+// If already logged in, redirect
+if (localStorage.getItem('simba_token') && window.location.search !== '?logout') {
+  // Don't auto-redirect, just show a logged-in state option
+}
+</script>
+</body>
+</html>

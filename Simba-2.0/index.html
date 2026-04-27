@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Simba Supermarket — Kigali's Online Supermarket</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--orange:#E8620A;--orange-dark:#c04f06;--orange-light:#fff3eb;--black:#0e0c0a;--white:#fffcf8;--gray:#6b6560;--gray-light:#f5f2ee;--green:#0a6e3f;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 5%;display:flex;align-items:center;justify-content:space-between;height:68px;background:rgba(255,252,248,0.85);backdrop-filter:blur(12px);border-bottom:1px solid rgba(232,98,10,0.1);transition:all 0.3s;}
+nav.scrolled{background:rgba(255,252,248,0.98);box-shadow:0 2px 20px rgba(0,0,0,0.08);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.nav-logo-img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--orange);flex-shrink:0;}
+.nav-logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;color:var(--black);}
+.nav-logo-text span{color:var(--orange);}
+.nav-links{display:flex;align-items:center;gap:8px;}
+.nav-lang{display:flex;gap:4px;margin-right:8px;}
+.nav-lang button{background:none;border:1.5px solid transparent;border-radius:20px;padding:4px 10px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--gray);cursor:pointer;transition:all 0.2s;}
+.nav-lang button.active{border-color:var(--orange);color:var(--orange);}
+.nav-btn{padding:9px 20px;border-radius:24px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;transition:all 0.2s;display:inline-block;}
+.nav-btn-ghost{background:none;border:1.5px solid rgba(14,12,10,0.15);color:var(--black);}
+.nav-btn-ghost:hover{border-color:var(--orange);color:var(--orange);}
+.nav-btn-solid{background:var(--orange);border:1.5px solid var(--orange);color:white;}
+.nav-btn-solid:hover{background:var(--orange-dark);}
+.nav-mobile-menu{display:none;background:none;border:none;cursor:pointer;font-size:22px;}
+.hero{min-height:100vh;padding:120px 5% 80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 70% 50%,rgba(232,98,10,0.07) 0%,transparent 70%),radial-gradient(ellipse 30% 40% at 20% 80%,rgba(232,98,10,0.04) 0%,transparent 60%);pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,98,10,0.1);border:1px solid rgba(232,98,10,0.2);border-radius:30px;padding:6px 14px;margin-bottom:28px;animation:fadeUp 0.6s ease both;}
+.hero-badge-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+.hero-badge span{font-size:13px;font-weight:500;color:var(--orange);}
+.hero-headline{font-family:'Syne',sans-serif;font-size:clamp(42px,5.5vw,72px);font-weight:800;line-height:1.08;letter-spacing:-0.02em;margin-bottom:24px;animation:fadeUp 0.6s 0.1s ease both;}
+.hero-headline em{font-style:normal;color:var(--orange);}
+.hero-sub{font-size:17px;line-height:1.7;color:var(--gray);max-width:480px;margin-bottom:40px;animation:fadeUp 0.6s 0.2s ease both;}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;animation:fadeUp 0.6s 0.3s ease both;}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--orange);color:white;padding:14px 28px;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;text-decoration:none;border:none;cursor:pointer;transition:all 0.25s;box-shadow:0 4px 20px rgba(232,98,10,0.3);}
+.btn-primary:hover{background:var(--orange-dark);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,98,10,0.4);}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;background:white;color:var(--black);padding:14px 28px;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:16px;font-weight:500;text-decoration:none;border:1.5px solid rgba(14,12,10,0.12);cursor:pointer;transition:all 0.25s;}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange);transform:translateY(-2px);}
+.hero-trust{display:flex;align-items:center;gap:20px;margin-top:36px;animation:fadeUp 0.6s 0.4s ease both;}
+.hero-trust-avatars{display:flex;}
+.hero-trust-avatars span{width:34px;height:34px;border-radius:50%;border:2px solid white;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;margin-left:-8px;}
+.hero-trust-avatars span:first-child{margin-left:0;}
+.hero-trust-text{font-size:13px;color:var(--gray);}
+.hero-trust-text strong{color:var(--black);}
+.hero-visual{position:relative;animation:fadeUp 0.6s 0.2s ease both;}
+.hero-card-main{background:white;border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,0.1);overflow:hidden;border:1px solid rgba(0,0,0,0.06);}
+.hero-card-img{width:100%;height:240px;display:flex;align-items:center;justify-content:center;font-size:80px;background:linear-gradient(135deg,#fff3eb,#ffe0c8);}
+.hero-card-body{padding:20px 24px;}
+.hero-card-body h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+.hero-card-body p{font-size:13px;color:var(--gray);}
+.hero-card-footer{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-top:1px solid var(--gray-light);}
+.hero-card-price{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--orange);}
+.hero-card-price span{font-size:12px;font-weight:400;color:var(--gray);}
+.hero-add-btn{background:var(--orange);color:white;border:none;padding:8px 18px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.hero-float{position:absolute;background:white;border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,0.12);padding:12px 16px;border:1px solid rgba(0,0,0,0.06);display:flex;align-items:center;gap:10px;}
+.hero-float-1{top:-20px;right:-20px;animation:float 4s ease-in-out infinite;}
+.hero-float-2{bottom:80px;left:-30px;animation:float 4s 1s ease-in-out infinite;}
+.hero-float-3{bottom:-10px;right:20px;animation:float 4s 2s ease-in-out infinite;}
+.hero-float span{font-size:22px;}
+.hero-float-content p{font-size:12px;color:var(--gray);line-height:1.3;}
+.hero-float-content strong{font-size:14px;font-weight:600;display:block;}
+.hero-float-green strong{color:var(--green);}
+.props{padding:80px 5%;background:var(--gray-light);}
+.props-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;max-width:1200px;margin:0 auto;}
+.prop-card{background:white;border-radius:20px;padding:28px 24px;border:1px solid rgba(0,0,0,0.06);transition:all 0.25s;}
+.prop-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.08);}
+.prop-icon{font-size:32px;margin-bottom:14px;}
+.prop-card h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:6px;}
+.prop-card p{font-size:14px;color:var(--gray);line-height:1.6;}
+.cats{padding:80px 5%;}
+.section-header{text-align:center;margin-bottom:48px;}
+.section-label{display:inline-block;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:12px;}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,42px);font-weight:800;line-height:1.15;letter-spacing:-0.02em;}
+.cats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1200px;margin:0 auto;}
+.cat-card{border-radius:20px;overflow:hidden;position:relative;height:180px;cursor:pointer;text-decoration:none;transition:all 0.3s;display:block;}
+.cat-card:hover{transform:scale(1.02);}
+.cat-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:64px;}
+.cat-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(14,12,10,0.75) 0%,transparent 60%);transition:opacity 0.3s;}
+.cat-label{position:absolute;bottom:18px;left:18px;font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:white;}
+.cat-count{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 12px;font-size:12px;color:white;font-weight:500;}
+.how{padding:80px 5%;background:var(--black);}
+.how .section-title{color:white;}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:1100px;margin:0 auto;position:relative;}
+.steps::before{content:'';position:absolute;top:36px;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,rgba(232,98,10,0.4),transparent);}
+.step{text-align:center;padding:0 16px;}
+.step-num{width:72px;height:72px;border-radius:50%;background:rgba(232,98,10,0.15);border:1.5px solid rgba(232,98,10,0.3);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;position:relative;z-index:1;transition:all 0.3s;}
+.step:hover .step-num{background:var(--orange);border-color:var(--orange);}
+.step h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:white;margin-bottom:8px;}
+.step p{font-size:13px;color:#888;line-height:1.6;}
+.branches{padding:80px 5%;}
+.branches-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1200px;margin:0 auto;}
+.branch-card{background:white;border-radius:16px;border:1.5px solid rgba(0,0,0,0.07);padding:20px;display:flex;gap:14px;align-items:flex-start;transition:all 0.25s;cursor:pointer;}
+.branch-card:hover{border-color:var(--orange);box-shadow:0 8px 24px rgba(232,98,10,0.1);transform:translateY(-2px);}
+.branch-icon{width:44px;height:44px;flex-shrink:0;background:var(--orange-light);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.branch-info h4{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px;}
+.branch-info p{font-size:13px;color:var(--gray);}
+.branch-badge{margin-left:auto;flex-shrink:0;background:#e8f5ee;color:var(--green);font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;}
+.proof{padding:80px 5%;background:var(--gray-light);}
+.proof-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto;}
+.proof-card{background:white;border-radius:20px;padding:28px;border:1px solid rgba(0,0,0,0.06);}
+.proof-stars{color:var(--orange);font-size:16px;margin-bottom:14px;letter-spacing:2px;}
+.proof-text{font-size:15px;line-height:1.7;color:#333;margin-bottom:20px;font-style:italic;}
+.proof-author{display:flex;align-items:center;gap:12px;}
+.proof-avatar{width:40px;height:40px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:14px;}
+.proof-author-info strong{display:block;font-size:14px;font-weight:600;}
+.proof-author-info span{font-size:12px;color:var(--gray);}
+.stats{padding:80px 5%;background:var(--orange);}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;max-width:1000px;margin:0 auto;text-align:center;}
+.stat{padding:0 20px;}
+.stat+.stat{border-left:1px solid rgba(255,255,255,0.2);}
+.stat-num{font-family:'Syne',sans-serif;font-size:clamp(36px,4vw,52px);font-weight:800;color:white;line-height:1;}
+.stat-label{font-size:14px;color:rgba(255,255,255,0.75);margin-top:8px;}
+.cta-section{padding:100px 5%;text-align:center;background:var(--black);position:relative;overflow:hidden;}
+.cta-section::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(232,98,10,0.12),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);}
+.cta-section .section-title{color:white;position:relative;}
+.cta-section p{font-size:17px;color:#888;margin:16px auto 40px;max-width:500px;position:relative;}
+.cta-section .btn-primary{position:relative;font-size:17px;padding:16px 36px;}
+footer{background:#0a0806;padding:60px 5% 30px;border-top:1px solid rgba(255,255,255,0.06);}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px;}
+.footer-brand p{font-size:14px;color:#666;line-height:1.7;margin-top:12px;max-width:280px;}
+.footer-col h4{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:white;margin-bottom:16px;}
+.footer-col a{display:block;font-size:14px;color:#666;text-decoration:none;margin-bottom:8px;transition:color 0.2s;}
+.footer-col a:hover{color:var(--orange);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.06);padding-top:24px;}
+.footer-bottom p{font-size:13px;color:#444;}
+.mobile-nav{display:none;position:fixed;top:68px;left:0;right:0;z-index:99;background:var(--white);border-bottom:1px solid rgba(0,0,0,0.08);padding:20px 5%;flex-direction:column;gap:16px;box-shadow:0 8px 30px rgba(0,0,0,0.1);}
+.mobile-nav.open{display:flex;}
+.mobile-nav a{font-size:16px;font-weight:500;color:var(--black);text-decoration:none;padding:12px 0;border-bottom:1px solid var(--gray-light);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(0.9);}}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;text-align:center;padding-top:100px;}
+  .hero-sub,.hero-trust{margin-left:auto;margin-right:auto;}
+  .hero-ctas,.hero-trust{justify-content:center;}
+  .hero-visual{display:none;}
+  .props-grid{grid-template-columns:repeat(2,1fr);}
+  .cats-grid{grid-template-columns:repeat(2,1fr);}
+  .steps{grid-template-columns:repeat(2,1fr);}
+  .steps::before{display:none;}
+  .branches-grid{grid-template-columns:repeat(2,1fr);}
+  .proof-grid{grid-template-columns:1fr;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:24px;}
+  .stat+.stat{border-left:none;}
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .nav-links{display:none;}
+  .nav-mobile-menu{display:block;}
+}
+@media(max-width:560px){
+  .props-grid,.cats-grid,.branches-grid,.footer-top{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="data:image/png;base64,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" alt="Simba Supermarket" class="nav-logo-img"/>
+    <span class="nav-logo-text">Simba <span>2.0</span></span>
+  </a>
+  <div class="nav-links">
+    <div class="nav-lang">
+      <button class="active" onclick="setLang('en')">EN</button>
+      <button onclick="setLang('fr')">FR</button>
+      <button onclick="setLang('rw')">RW</button>
+    </div>
+    <a href="shop.html" class="nav-btn nav-btn-ghost" data-t="nav_shop">Shop</a>
+    <a href="auth.html" class="nav-btn nav-btn-ghost" data-t="nav_login">Sign In</a>
+    <a href="shop.html" class="nav-btn nav-btn-solid" data-t="nav_order">Order Now</a>
+  </div>
+  <button class="nav-mobile-menu" onclick="toggleMenu()">☰</button>
+</nav>
+
+<div class="mobile-nav" id="mobileNav">
+  <a href="shop.html" data-t="nav_shop">Shop</a>
+  <a href="auth.html" data-t="nav_login">Sign In</a>
+  <a href="auth.html" data-t="nav_register">Register</a>
+  <div style="display:flex;gap:8px;padding:8px 0;">
+    <button onclick="setLang('en')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #ddd;background:none;cursor:pointer;font-weight:600;">EN</button>
+    <button onclick="setLang('fr')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #ddd;background:none;cursor:pointer;font-weight:600;">FR</button>
+    <button onclick="setLang('rw')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #ddd;background:none;cursor:pointer;font-weight:600;">RW</button>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      <span data-t="hero_badge">Now delivering in Kigali</span>
+    </div>
+    <h1 class="hero-headline" data-t="hero_headline">Rwanda's <em>freshest</em><br/>supermarket,<br/>online.</h1>
+    <p class="hero-sub" data-t="hero_sub">Browse 552 products from Simba Supermarket. Pick up at any of our 9 Kigali branches. Pay with MTN MoMo.</p>
+    <div class="hero-ctas">
+      <a href="shop.html" class="btn-primary"><span>🛒</span> <span data-t="hero_cta_primary">Start Shopping</span></a>
+      <a href="#branches" class="btn-secondary"><span>📍</span> <span data-t="hero_cta_secondary">Find a Branch</span></a>
+    </div>
+    <div class="hero-trust">
+      <div class="hero-trust-avatars">
+        <span>JH</span><span>AM</span><span>BK</span><span>NG</span>
+      </div>
+      <p class="hero-trust-text" data-t="hero_trust">Trusted by <strong>10,000+</strong> Kigali families</p>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card-main">
+      <div class="hero-card-img">🛍️</div>
+      <div class="hero-card-body">
+        <h3>Dove Body Wash 500ml</h3>
+        <p>Cosmetics &amp; Personal Care</p>
+      </div>
+      <div class="hero-card-footer">
+        <div class="hero-card-price">8,983 <span>RWF</span></div>
+        <button class="hero-add-btn">+ Cart</button>
+      </div>
+    </div>
+    <div class="hero-float hero-float-1">
+      <span>⚡</span>
+      <div class="hero-float-content"><strong>Ready in 45 min</strong><p>Pick up at Remera</p></div>
+    </div>
+    <div class="hero-float hero-float-2 hero-float-green">
+      <span>✅</span>
+      <div class="hero-float-content"><strong>Order confirmed!</strong><p>MoMo payment received</p></div>
+    </div>
+    <div class="hero-float hero-float-3">
+      <span>📦</span>
+      <div class="hero-float-content"><strong>552 products</strong><p>Always in stock</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="props">
+  <div class="props-grid">
+    <div class="prop-card reveal"><div class="prop-icon">⚡</div><h3 data-t="prop1_title">45-Min Ready</h3><p data-t="prop1_desc">Place your order and it'll be packed and ready for pick-up at your chosen Simba branch in 45 minutes.</p></div>
+    <div class="prop-card reveal"><div class="prop-icon">📱</div><h3 data-t="prop2_title">MTN MoMo Payment</h3><p data-t="prop2_desc">Pay with MTN Mobile Money — Rwanda's most trusted payment method. Fast, secure, no cash needed.</p></div>
+    <div class="prop-card reveal"><div class="prop-icon">🏪</div><h3 data-t="prop3_title">9 Kigali Branches</h3><p data-t="prop3_desc">Pick up from Remera, Kimironko, Kacyiru, Nyamirambo and more. Always close to where you are.</p></div>
+    <div class="prop-card reveal"><div class="prop-icon">🌍</div><h3 data-t="prop4_title">3 Languages</h3><p data-t="prop4_desc">Shop in English, Français, or Ikinyarwanda. Simba speaks your language.</p></div>
+  </div>
+</section>
+
+<section class="cats">
+  <div class="section-header reveal">
+    <p class="section-label" data-t="cats_label">What are you looking for?</p>
+    <h2 class="section-title" data-t="cats_title">Shop by Category</h2>
+  </div>
+  <div class="cats-grid">
+    <a href="shop.html?category=Food+Products" class="cat-card reveal" style="background:linear-gradient(135deg,#fef3c7,#fde68a);"><div class="cat-bg">🍯</div><div class="cat-overlay"></div><span class="cat-label" data-t="cat_food">Food Products</span><span class="cat-count">17 items</span></a>
+    <a href="shop.html?category=Alcoholic+Drinks" class="cat-card reveal" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);"><div class="cat-bg">🍷</div><div class="cat-overlay"></div><span class="cat-label" data-t="cat_drinks">Drinks</span><span class="cat-count">180+ items</span></a>
+    <a href="shop.html?category=Cosmetics+%26+Personal+Care" class="cat-card reveal" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8);"><div class="cat-bg">💄</div><div class="cat-overlay"></div><span class="cat-label" data-t="cat_beauty">Beauty &amp; Care</span><span class="cat-count">250+ items</span></a>
+    <a href="shop.html?category=Cleaning+%26+Sanitary" class="cat-card reveal" style="background:linear-gradient(135deg,#e0f2fe,#bae6fd);"><div class="cat-bg">🧹</div><div class="cat-overlay"></div><span class="cat-label" data-t="cat_clean">Cleaning</span><span class="cat-count">30+ items</span></a>
+    <a href="shop.html?category=Kitchenware+%26+Electronics" class="cat-card reveal" style="background:linear-gradient(135deg,#fef9c3,#fef08a);"><div class="cat-bg">⚡</div><div class="cat-overlay"></div><span class="cat-label" data-t="cat_kitchen">Kitchen &amp; Electronics</span><span class="cat-count">40+ items</span></a>
+    <a href="shop.html" class="cat-card reveal" style="background:linear-gradient(135deg,#f0fdf4,#bbf7d0);"><div class="cat-bg">📦</div><div class="cat-overlay"></div><span class="cat-label" data-t="cat_all">View All</span><span class="cat-count">552 items</span></a>
+  </div>
+</section>
+
+<section class="how">
+  <div class="section-header reveal" style="margin-bottom:64px;">
+    <p class="section-label" data-t="how_label">Simple &amp; Fast</p>
+    <h2 class="section-title" data-t="how_title">How It Works</h2>
+  </div>
+  <div class="steps">
+    <div class="step reveal"><div class="step-num">🛒</div><h3 data-t="step1_title">Browse &amp; Add</h3><p data-t="step1_desc">Search or browse 552 products. Add what you need to your cart.</p></div>
+    <div class="step reveal"><div class="step-num">📍</div><h3 data-t="step2_title">Choose Branch</h3><p data-t="step2_desc">Pick your nearest Simba branch and a convenient pick-up time.</p></div>
+    <div class="step reveal"><div class="step-num">📱</div><h3 data-t="step3_title">Pay with MoMo</h3><p data-t="step3_desc">Confirm with a small MoMo deposit. Your order goes straight to the branch.</p></div>
+    <div class="step reveal"><div class="step-num">✅</div><h3 data-t="step4_title">Pick Up</h3><p data-t="step4_desc">Your order is packed and ready. Walk in, show your order ID, walk out.</p></div>
+  </div>
+</section>
+
+<section class="branches" id="branches">
+  <div class="section-header reveal">
+    <p class="section-label" data-t="branches_label">All Kigali Locations</p>
+    <h2 class="section-title" data-t="branches_title">Find Your Branch</h2>
+  </div>
+  <div class="branches-grid">
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Remera</h4><p>KG 9 Ave, Remera</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Kimironko</h4><p>KG 11 Ave, Kimironko</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Kacyiru</h4><p>KG 7 Ave, Kacyiru</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Nyamirambo</h4><p>KN 3 Ave, Nyamirambo</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Gikondo</h4><p>KK 15 Ave, Gikondo</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Kanombe</h4><p>KK 3 Ave, Kanombe</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Kinyinya</h4><p>KG 22 Ave, Kinyinya</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Kibagabaga</h4><p>KG 18 Ave, Kibagabaga</p></div><span class="branch-badge">Open</span></div>
+    <div class="branch-card reveal"><div class="branch-icon">📍</div><div class="branch-info"><h4>Simba Nyanza</h4><p>NZ 1 Ave, Nyanza</p></div><span class="branch-badge">Open</span></div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat reveal"><div class="stat-num">552</div><div class="stat-label" data-t="stat1">Products Available</div></div>
+    <div class="stat reveal"><div class="stat-num">9</div><div class="stat-label" data-t="stat2">Kigali Branches</div></div>
+    <div class="stat reveal"><div class="stat-num">45<span style="font-size:0.5em">min</span></div><div class="stat-label" data-t="stat3">Average Pick-Up Time</div></div>
+    <div class="stat reveal"><div class="stat-num">10K+</div><div class="stat-label" data-t="stat4">Happy Customers</div></div>
+  </div>
+</section>
+
+<section class="proof">
+  <div class="section-header reveal">
+    <p class="section-label" data-t="reviews_label">What Customers Say</p>
+    <h2 class="section-title" data-t="reviews_title">Loved in Kigali</h2>
+  </div>
+  <div class="proof-grid">
+    <div class="proof-card reveal"><div class="proof-stars">★★★★★</div><p class="proof-text" data-t="review1">"I ordered from Simba Kimironko at 10am and my groceries were ready in 30 minutes. MoMo payment worked perfectly!"</p><div class="proof-author"><div class="proof-avatar">JH</div><div class="proof-author-info"><strong>Jean-Paul H.</strong><span>Kimironko, Kigali</span></div></div></div>
+    <div class="proof-card reveal"><div class="proof-stars">★★★★★</div><p class="proof-text" data-t="review2">"Nashimye cyane! Nabonye ibintu byose nari nabiteguye kuri Simba Remera. Urubuga ni rworoshye gukoresha."</p><div class="proof-author"><div class="proof-avatar">AM</div><div class="proof-author-info"><strong>Amina M.</strong><span>Remera, Kigali</span></div></div></div>
+    <div class="proof-card reveal"><div class="proof-stars">★★★★★</div><p class="proof-text" data-t="review3">"Excellent service! J'ai commandé en français, payé via MoMo, récupéré ma commande à Kacyiru en moins d'une heure."</p><div class="proof-author"><div class="proof-avatar">BK</div><div class="proof-author-info"><strong>Brigitte K.</strong><span>Kacyiru, Kigali</span></div></div></div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="reveal">
+    <p class="section-label" data-t="cta_label">Ready to shop?</p>
+    <h2 class="section-title" data-t="cta_title">Your groceries are<br/>one tap away.</h2>
+    <p data-t="cta_sub">Join thousands of Kigali families who shop smarter with Simba 2.0.</p>
+    <a href="shop.html" class="btn-primary"><span>🛒</span> <span data-t="cta_btn">Start Shopping Now</span></a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="nav-logo" style="margin-bottom:0;">
+        <img src="data:image/png;base64,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" alt="Simba Supermarket" class="nav-logo-img" style="width:36px;height:36px;"/>
+        <span class="nav-logo-text" style="color:white;">Simba <span>2.0</span></span>
+      </div>
+      <p>Rwanda's trusted online supermarket. Fresh products, fast pick-up, easy MoMo payment.</p>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="footer_shop">Shop</h4>
+      <a href="shop.html?category=Food+Products" data-t="cat_food">Food Products</a>
+      <a href="shop.html?category=Alcoholic+Drinks" data-t="cat_drinks">Drinks</a>
+      <a href="shop.html?category=Cosmetics+%26+Personal+Care" data-t="cat_beauty">Beauty &amp; Care</a>
+      <a href="shop.html" data-t="cat_all">View All</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="footer_account">Account</h4>
+      <a href="auth.html" data-t="nav_login">Sign In</a>
+      <a href="auth.html" data-t="nav_register">Register</a>
+      <a href="orders.html" data-t="footer_orders">My Orders</a>
+    </div>
+    <div class="footer-col">
+      <h4 data-t="footer_branches">Branches</h4>
+      <a href="#branches">Remera</a>
+      <a href="#branches">Kimironko</a>
+      <a href="#branches">Kacyiru</a>
+      <a href="#branches">Nyamirambo</a>
+      <a href="#branches">+ 5 more</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Simba Supermarket Ltd · Kigali, Rwanda</p>
+    <p style="color:#444;">🦁 Built with ❤️ for Rwanda</p>
+  </div>
+</footer>
+
+<script>
+const T={en:{nav_shop:"Shop",nav_login:"Sign In",nav_order:"Order Now",nav_register:"Register",hero_badge:"Now delivering in Kigali",hero_headline:"Rwanda's <em>freshest</em><br/>supermarket,<br/>online.",hero_sub:"Browse 552 products from Simba Supermarket. Pick up at any of our 9 Kigali branches. Pay with MTN MoMo.",hero_cta_primary:"Start Shopping",hero_cta_secondary:"Find a Branch",hero_trust:"Trusted by <strong>10,000+</strong> Kigali families",prop1_title:"45-Min Ready",prop1_desc:"Place your order and it'll be packed and ready for pick-up at your chosen Simba branch in 45 minutes.",prop2_title:"MTN MoMo Payment",prop2_desc:"Pay with MTN Mobile Money — Rwanda's most trusted payment method. Fast, secure, no cash needed.",prop3_title:"9 Kigali Branches",prop3_desc:"Pick up from Remera, Kimironko, Kacyiru, Nyamirambo and more. Always close to where you are.",prop4_title:"3 Languages",prop4_desc:"Shop in English, Français, or Ikinyarwanda. Simba speaks your language.",cats_label:"What are you looking for?",cats_title:"Shop by Category",cat_food:"Food Products",cat_drinks:"Drinks",cat_beauty:"Beauty & Care",cat_clean:"Cleaning",cat_kitchen:"Kitchen & Electronics",cat_all:"View All",how_label:"Simple & Fast",how_title:"How It Works",step1_title:"Browse & Add",step1_desc:"Search or browse 552 products. Add what you need to your cart.",step2_title:"Choose Branch",step2_desc:"Pick your nearest Simba branch and a convenient pick-up time.",step3_title:"Pay with MoMo",step3_desc:"Confirm with a small MoMo deposit. Your order goes straight to the branch.",step4_title:"Pick Up",step4_desc:"Your order is packed and ready. Walk in, show your order ID, walk out.",branches_label:"All Kigali Locations",branches_title:"Find Your Branch",stat1:"Products Available",stat2:"Kigali Branches",stat3:"Average Pick-Up Time",stat4:"Happy Customers",reviews_label:"What Customers Say",reviews_title:"Loved in Kigali",review1:'"I ordered from Simba Kimironko at 10am and my groceries were ready in 30 minutes. MoMo payment worked perfectly!"',review2:'"Nashimye cyane! Nabonye ibintu byose nari nabiteguye kuri Simba Remera. Urubuga ni rworoshye gukoresha."',review3:"\"Excellent service! J'ai commandé en français, payé via MoMo, récupéré ma commande à Kacyiru en moins d'une heure.\"",cta_label:"Ready to shop?",cta_title:"Your groceries are<br/>one tap away.",cta_sub:"Join thousands of Kigali families who shop smarter with Simba 2.0.",cta_btn:"Start Shopping Now",footer_shop:"Shop",footer_account:"Account",footer_orders:"My Orders",footer_branches:"Branches"},fr:{nav_shop:"Boutique",nav_login:"Connexion",nav_order:"Commander",nav_register:"S'inscrire",hero_badge:"Livraison disponible à Kigali",hero_headline:"Le supermarché <em>le plus frais</em><br/>du Rwanda,<br/>en ligne.",hero_sub:"Parcourez 552 produits de Simba Supermarket. Retirez dans l'une de nos 9 agences à Kigali. Payez avec MTN MoMo.",hero_cta_primary:"Commencer",hero_cta_secondary:"Trouver une agence",hero_trust:"Fait confiance par <strong>10 000+</strong> familles de Kigali",prop1_title:"Prêt en 45 min",prop1_desc:"Passez votre commande et elle sera prête au retrait dans votre agence Simba en 45 minutes.",prop2_title:"Paiement MTN MoMo",prop2_desc:"Payez avec MTN Mobile Money — la méthode de paiement la plus fiable du Rwanda.",prop3_title:"9 agences à Kigali",prop3_desc:"Retrait à Remera, Kimironko, Kacyiru, Nyamirambo et plus. Toujours proche de vous.",prop4_title:"3 langues",prop4_desc:"Faites vos courses en anglais, français ou kinyarwanda. Simba parle votre langue.",cats_label:"Que cherchez-vous ?",cats_title:"Acheter par catégorie",cat_food:"Alimentation",cat_drinks:"Boissons",cat_beauty:"Beauté & Soins",cat_clean:"Nettoyage",cat_kitchen:"Cuisine & Électronique",cat_all:"Tout voir",how_label:"Simple & Rapide",how_title:"Comment ça marche",step1_title:"Parcourir & Ajouter",step1_desc:"Recherchez parmi 552 produits. Ajoutez ce dont vous avez besoin.",step2_title:"Choisir une agence",step2_desc:"Choisissez l'agence Simba la plus proche et un horaire de retrait.",step3_title:"Payer avec MoMo",step3_desc:"Confirmez avec un petit dépôt MoMo. Votre commande va directement à l'agence.",step4_title:"Retirer",step4_desc:"Votre commande est prête. Entrez, montrez votre numéro de commande, repartez.",branches_label:"Toutes les agences de Kigali",branches_title:"Trouver votre agence",stat1:"Produits disponibles",stat2:"Agences à Kigali",stat3:"Temps de retrait moyen",stat4:"Clients satisfaits",reviews_label:"Avis clients",reviews_title:"Aimé à Kigali",review1:"\"J'ai commandé depuis Simba Kimironko à 10h et mes courses étaient prêtes en 30 minutes!\"",review2:'"Nashimye cyane! Nabonye ibintu byose nari nabiteguye kuri Simba Remera."',review3:"\"Excellent service! J'ai commandé en français, payé via MoMo, récupéré ma commande à Kacyiru en moins d'une heure.\"",cta_label:"Prêt à faire vos courses ?",cta_title:"Vos courses à<br/>portée de main.",cta_sub:"Rejoignez des milliers de familles de Kigali qui font leurs courses avec Simba 2.0.",cta_btn:"Commencer maintenant",footer_shop:"Boutique",footer_account:"Compte",footer_orders:"Mes commandes",footer_branches:"Agences"},rw:{nav_shop:"Gura",nav_login:"Injira",nav_order:"Saba Ubu",nav_register:"Iyandikishe",hero_badge:"Ubu dushyira ibicuruzwa i Kigali",hero_headline:"Isoko <em>nziza kurenza</em><br/>mu Rwanda,<br/>kuri internet.",hero_sub:"Shakisha ibicuruzwa 552 bya Simba Supermarket. Hita i Kigali mu mashami yacu 9. Ishyura na MTN MoMo.",hero_cta_primary:"Tangira Kugura",hero_cta_secondary:"Shakisha Ishami",hero_trust:"Bizerwa n'imiryango <strong>10,000+</strong> i Kigali",prop1_title:"Biteguwe mu minota 45",prop1_desc:"Saba ibicuruzwa byawe bigateguriwe gutwakwa mu ishami rya Simba mu minota 45.",prop2_title:"Kwishyura na MTN MoMo",prop2_desc:"Ishyura na MTN Mobile Money — uburyo bwo kwishyura buzerwa cyane mu Rwanda.",prop3_title:"Amashami 9 i Kigali",prop3_desc:"Twaka i Remera, Kimironko, Kacyiru, Nyamirambo n'ahandi. Buri gihe hafi yawe.",prop4_title:"Indimi 3",prop4_desc:"Gura mu Cyongereza, Igifaransa, cyangwa Ikinyarwanda. Simba ivuga ururimi rwawe.",cats_label:"Urashaka iki?",cats_title:"Gura ukurikije Icyiciro",cat_food:"Ibiribwa",cat_drinks:"Inzoga",cat_beauty:"Isuku n'Ubwiza",cat_clean:"Gukaraba",cat_kitchen:"Igikoni & Ikoranabuhanga",cat_all:"Reba Byose",how_label:"Byoroshye & Biihuta",how_title:"Bikorwa Gute",step1_title:"Shakisha & Ongeraho",step1_desc:"Shakisha mu bicuruzwa 552. Ongeraho ibyo ukeneye mu agasanduku.",step2_title:"Hitamo Ishami",step2_desc:"Hitamo ishami rya Simba hafi yawe n'igihe cyo gutwaka.",step3_title:"Ishyura na MoMo",step3_desc:"Emeza na depositi nto ya MoMo. Itumwa ryawe rigenda ako kanya ku ishami.",step4_title:"Twaka",step4_desc:"Itumwa ryawe riteguye. Injira, erekana numero y'itumwa, usohe.",branches_label:"Amashami Yose i Kigali",branches_title:"Shakisha Ishami Ryawe",stat1:"Ibicuruzwa Bihari",stat2:"Amashami i Kigali",stat3:"Igihe Cyo Gutwaka",stat4:"Abakiriya Bashimye",reviews_label:"Abakiriya Bavuga Iki",reviews_title:"Bikunzwe i Kigali",review1:'"Nasabye ibicuruzwa kuri Simba Kimironko saa nne z\'igitondo kandi byarategurwa mu minota 30!"',review2:'"Nashimye cyane! Nabonye ibintu byose nari nabiteguye kuri Simba Remera. Urubuga ni rworoshye gukoresha."',review3:'"Serivisi nziza! Nasabye mu Gifaransa, nishyura na MoMo, maze ndatwaka i Kacyiru mu isaha imwe."',cta_label:"Witeguye kugura?",cta_title:"Ibiribwa byawe<br/>bibaye kure n'inzito imwe.",cta_sub:"Injira mu miryango ibihumbi by'i Kigali igura neza na Simba 2.0.",cta_btn:"Tangira Kugura Ubu",footer_shop:"Gura",footer_account:"Konti",footer_orders:"Amatumwa Yanjye",footer_branches:"Amashami"}};
+let currentLang=localStorage.getItem('simba_lang')||'en';
+function setLang(lang){currentLang=lang;localStorage.setItem('simba_lang',lang);applyTranslations();document.querySelectorAll('.nav-lang button').forEach(b=>{b.classList.toggle('active',b.textContent===lang.toUpperCase());});}
+function applyTranslations(){const dict=T[currentLang];document.querySelectorAll('[data-t]').forEach(el=>{const key=el.getAttribute('data-t');if(dict[key]!==undefined)el.innerHTML=dict[key];});}
+window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>40);});
+const observer=new IntersectionObserver((entries)=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('visible'),i*80);});},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+function toggleMenu(){document.getElementById('mobileNav').classList.toggle('open');}
+applyTranslations();
+document.querySelectorAll('.nav-lang button').forEach(b=>{b.classList.toggle('active',b.textContent===currentLang.toUpperCase());});
+</script>
+</body>
+</html>
