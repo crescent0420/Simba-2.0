@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Wishlist — Simba 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--orange:#E8620A;--orange-dark:#c04f06;--orange-light:#fff3eb;--black:#0e0c0a;--white:#fffcf8;--gray:#6b6560;--gray-light:#f5f2ee;--green:#0a6e3f;--green-light:#e8f5ee;--border:rgba(0,0,0,0.09);--red:#dc2626;--red-light:#fef2f2;}
+body{font-family:"DM Sans",sans-serif;background:var(--gray-light);color:var(--black);min-height:100vh;}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,252,248,0.97);backdrop-filter:blur(14px);border-bottom:1px solid rgba(232,98,10,0.12);padding:0 4%;display:flex;align-items:center;gap:12px;height:62px;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.nav-logo-img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--orange);flex-shrink:0;}
+.nav-logo-text{font-family:"Syne",sans-serif;font-weight:700;font-size:16px;color:var(--black);}
+.nav-logo-text span{color:var(--orange);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.nav-links{display:flex;gap:4px;}
+.nav-links a{padding:7px 14px;border-radius:10px;font-size:14px;font-weight:500;text-decoration:none;transition:all 0.2s;color:var(--gray);}
+.nav-links a:hover{color:var(--orange);}
+.nav-links a.active{color:var(--orange);background:var(--orange-light);}
+.lang-grp{display:flex;gap:2px;}
+.lbtn{background:none;border:1.5px solid transparent;border-radius:14px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--gray);cursor:pointer;transition:all 0.15s;font-family:"DM Sans",sans-serif;}
+.lbtn.active{border-color:var(--orange);color:var(--orange);}
+
+.page-header{background:white;padding:24px 4%;border-bottom:1px solid var(--border);}
+.page-header h1{font-family:"Syne",sans-serif;font-size:26px;font-weight:800;margin-bottom:4px;}
+.page-header p{font-size:14px;color:var(--gray);}
+
+.main{padding:24px 4%;max-width:900px;margin:0 auto;}
+
+.wish-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+.wish-card{background:white;border-radius:16px;border:1.5px solid var(--border);overflow:hidden;transition:all 0.2s;}
+.wish-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.08);transform:translateY(-2px);}
+.wish-img{height:160px;background:var(--gray-light);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative;}
+.wish-img img{width:100%;height:100%;object-fit:cover;}
+.wish-remove{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:50%;background:white;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all 0.2s;}
+.wish-remove:hover{background:var(--red);color:white;}
+.wish-body{padding:16px;}
+.wish-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--orange);margin-bottom:4px;}
+.wish-name{font-size:14px;font-weight:600;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.wish-price{font-family:"Syne",sans-serif;font-size:18px;font-weight:800;color:var(--orange);margin-bottom:12px;}
+.wish-actions{display:flex;gap:8px;}
+.wish-add{flex:1;padding:9px;background:var(--orange);color:white;border:none;border-radius:10px;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.wish-add:hover{background:var(--orange-dark);}
+.wish-add.added{background:var(--green);}
+.wish-view{flex:1;padding:9px;background:none;color:var(--black);border:1.5px solid var(--border);border-radius:10px;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none;text-align:center;}
+.wish-view:hover{border-color:var(--orange);color:var(--orange);}
+
+.empty-state{text-align:center;padding:80px 20px;background:white;border-radius:16px;border:1.5px solid var(--border);}
+.empty-icon{font-size:56px;margin-bottom:16px;}
+.empty-state h3{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;}
+.empty-state p{font-size:14px;color:var(--gray);margin-bottom:24px;}
+.shop-btn{display:inline-block;background:var(--orange);color:white;padding:12px 28px;border-radius:12px;text-decoration:none;font-weight:600;font-size:14px;}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:white;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:500;transform:translateY(80px);opacity:0;transition:all 0.3s;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{background:var(--green);}
+.toast.red{background:var(--red);}
+
+@media(max-width:600px){.wish-grid{grid-template-columns:repeat(2,1fr);}.wish-img{height:120px;}.main{padding:16px 3%;}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html">
+    <svg class="nav-logo-img" width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="Simba"><circle cx="18" cy="18" r="18" fill="#E8620A"/><text x="18" y="18" text-anchor="middle" dominant-baseline="central" fill="white" font-size="20" font-weight="bold" font-family="Syne,Arial,sans-serif">S</text></svg>
+    <span class="nav-logo-text">Simba <span>2.0</span></span>
+  </a>
+  <div class="nav-right">
+    <div class="lang-grp">
+      <button class="lbtn" onclick="setLang('en')" id="btn-en">EN</button>
+      <button class="lbtn" onclick="setLang('fr')" id="btn-fr">FR</button>
+      <button class="lbtn" onclick="setLang('rw')" id="btn-rw">RW</button>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" data-t="nav_home">Home</a>
+      <a href="shop.html" data-t="nav_shop">Shop</a>
+      <a href="orders.html" data-t="nav_orders">My Orders</a>
+      <a href="wishlist.html" class="active" data-t="nav_wishlist">Wishlist</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1 data-t="title">My Wishlist</h1>
+  <p data-t="subtitle">Save products you love for later</p>
+</div>
+
+<div class="main" id="mainWrap"></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/services.js"></script>
+<script src="js/api.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/lang-switcher.js"></script>
+<script>
+const T = {
+  en:{nav_home:"Home",nav_shop:"Shop",nav_orders:"My Orders",nav_wishlist:"Wishlist",title:"My Wishlist",subtitle:"Save products you love for later",add_to_cart:"Add to Cart",view_product:"View",removed:"Removed from wishlist",added:"Added to cart!",empty_title:"Your wishlist is empty",empty_sub:"Save products you love and they'll appear here.",start_shopping:"Start Shopping",items:"items"},
+  fr:{nav_home:"Accueil",nav_shop:"Boutique",nav_orders:"Mes Commandes",nav_wishlist:"Favoris",title:"Mes Favoris",subtitle:"Enregistrez vos produits pr\u00e9f\u00e9r\u00e9s pour plus tard",add_to_cart:"Ajouter au panier",view_product:"Voir",removed:"Retir\u00e9 des favoris",added:"Ajout\u00e9 au panier !",empty_title:"Votre liste est vide",empty_sub:"Enregistrez vos produits pr\u00e9f\u00e9r\u00e9s et ils appara\u00eetront ici.",start_shopping:"Commencer les achats",items:"articles"},
+  rw:{nav_home:"Inyuma",nav_shop:"Isoko",nav_orders:"Ibyuririwe",nav_wishlist:"Ibikunda",title:"Ibikunda Byanjye",subtitle:"Fungura ibicuruzwa wishakunze uhindukire hano",add_to_cart:"Weza mu Gasanduku",view_product:"Reba",removed:"Byasibutse mubikunda",added:"Byongejwe!",empty_title:"Nta kikunda",empty_sub:"Fungura ibicuruzwa wishakunze bizagaruka hano.",start_shopping:"Tangira Kugura",items:"ibicuruzwa"}
+};
+
+
+let lang = localStorage.getItem("simba_lang")||"en";
+
+function tr(k){return (T[lang]||T.en)[k]||k;}
+function setLang(l){lang=l;localStorage.setItem("simba_lang",l);applyLang();render();}
+function setActiveLangBtn(){["en","fr","rw"].forEach(l=>{document.getElementById("btn-"+l).classList.toggle("active",l===lang);});}
+function applyLang(){document.querySelectorAll("[data-t]").forEach(el=>{const k=el.getAttribute("data-t");el.textContent=tr(k);});}
+
+function render(){
+  const wrap = document.getElementById("mainWrap");
+  const wish = Wishlist.get();
+  
+  if (!wish.length) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">&#9825;</div>
+        <h3>${tr("empty_title")}</h3>
+        <p>${tr("empty_sub")}</p>
+        <a href="shop.html" class="shop-btn">${tr("start_shopping")}</a>
+      </div>`;
+    return;
+  }
+  
+  wrap.innerHTML = `<div class="wish-grid">` + wish.map(p => `
+    <div class="wish-card">
+      <div class="wish-img">
+        ${p.image ? '<img src="'+p.image+'" alt="" style="width:100%;height:100%;object-fit:contain;padding:8px;">' : '<span style="font-size:28px;font-weight:800;color:var(--orange)">'+p.name.charAt(0).toUpperCase()+'</span>'}
+        <button class="wish-remove" onclick="removeFromWishlist(${p.id})">&#10005;</button>
+      </div>
+      <div class="wish-body">
+        <div class="wish-cat">${p.category||"General"}</div>
+        <div class="wish-name">${p.name}</div>
+        <div class="wish-price">${Math.round(p.price).toLocaleString()} RWF</div>
+        <div class="wish-actions">
+          <button class="wish-add" id="wbtn-${p.id}" onclick="addToCart(${p.id})">${tr("add_to_cart")}</button>
+          <a href="product.html?id=${p.id}&category="+encodeURIComponent("${p.category||'General'}") class="wish-view">${tr("view_product")}</a>
+        </div>
+      </div>
+    </div>`).join("")+`</div>
+    <p style="text-align:center;font-size:13px;color:var(--gray);margin-top:16px;">${wish.length} ${tr("items")}</p>`;
+}
+
+function removeFromWishlist(id){
+  Wishlist.remove(id);
+  showToast(tr("removed"), "red");
+  render();
+}
+
+function addToCart(id) {
+  const wish = Wishlist.get();
+  const p = wish.find(w => w.id === id);
+  if (!p) return;
+  Wishlist.toCart(p);
+  const btn = document.getElementById("wbtn-" + id);
+  if (btn) { btn.classList.add("added"); btn.textContent = "✅ " + tr("added"); }
+  showToast(tr("added"), "green");
+  render();
+}
+
+function showToast(msg, type = "") {
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.className="toast show"+(type?" "+type:"");
+  setTimeout(()=>t.classList.remove("show"),3000);
+}
+
+setActiveLangBtn();
+applyLang();
+render();
+lucide.createIcons();
+</script>
+</body>
+</html>

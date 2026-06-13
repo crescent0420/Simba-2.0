@@ -1,0 +1,352 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Checkout — Simba 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --orange:#E8620A;--orange-dark:#c04f06;--orange-light:#fff3eb;
+  --black:#0e0c0a;--white:#fffcf8;--gray:#6b6560;--gray-light:#f5f2ee;
+  --green:#0a6e3f;--green-light:#e8f5ee;--border:rgba(0,0,0,0.09);
+  --red:#dc2626;
+}
+html{scroll-behavior:smooth;}
+body{font-family:"DM Sans",sans-serif;background:var(--white);color:var(--black);min-height:100vh;}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,252,248,0.96);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(232,98,10,0.12);
+  padding:0 4%;display:flex;align-items:center;gap:12px;height:62px;
+}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.nav-logo-img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--orange);flex-shrink:0;}
+.nav-logo-text{font-family:"Syne",sans-serif;font-weight:700;font-size:16px;color:var(--black);}
+.nav-logo-text span{color:var(--orange);}
+.nav-back{margin-left:auto;display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--gray);font-size:14px;font-weight:500;padding:7px 14px;border:1.5px solid var(--border);border-radius:10px;transition:all 0.2s;}
+.nav-back:hover{border-color:var(--orange);color:var(--orange);}
+.nav-lang{display:flex;gap:4px;margin-left:16px;}
+.nav-lang button{background:none;border:1.5px solid transparent;border-radius:20px;padding:4px 10px;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:500;color:var(--gray);cursor:pointer;transition:all 0.2s;}
+.nav-lang button.active{border-color:var(--orange);color:var(--orange);}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap{background:var(--gray-light);border-bottom:1px solid var(--border);padding:0 4%;}
+.progress-bar{max-width:900px;margin:0 auto;display:flex;align-items:center;padding:18px 0;}
+.prog-step{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;}
+.prog-step.active{color:var(--orange);}
+.prog-step.done{color:var(--green);}
+.prog-step.inactive{color:var(--gray);}
+.prog-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.prog-step.active .prog-num{background:var(--orange);color:white;}
+.prog-step.done .prog-num{background:var(--green);color:white;}
+.prog-step.inactive .prog-num{background:var(--gray-light);border:1.5px solid var(--border);color:var(--gray);}
+.prog-sep{flex:1;height:1.5px;background:var(--border);margin:0 10px;max-width:80px;}
+.prog-sep.done{background:var(--green);}
+
+/* ── LAYOUT ── */
+.checkout-wrap{max-width:900px;margin:0 auto;padding:36px 4% 80px;display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start;}
+
+/* ── CARD ── */
+.card{background:white;border-radius:18px;border:1.5px solid var(--border);padding:28px;margin-bottom:20px;}
+.card-title{font-family:"Syne",sans-serif;font-size:18px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.card-title .step-badge{width:28px;height:28px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;flex-shrink:0;}
+
+/* ── BRANCH SELECTOR ── */
+.branch-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.branch-option{border:1.5px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:all 0.2s;position:relative;}
+.branch-option:hover{border-color:rgba(232,98,10,0.4);}
+.branch-option.selected{border-color:var(--orange);background:var(--orange-light);}
+.branch-option input[type="radio"]{position:absolute;opacity:0;}
+.branch-name{font-family:"Syne",sans-serif;font-weight:700;font-size:14px;margin-bottom:3px;}
+.branch-addr{font-size:12px;color:var(--gray);line-height:1.4;}
+.branch-badge{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;font-weight:600;color:var(--green);background:var(--green-light);padding:3px 8px;border-radius:20px;}
+.branch-check{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;background:white;transition:all 0.2s;}
+.branch-option.selected .branch-check{background:var(--orange);border-color:var(--orange);color:white;}
+
+/* ── TIME SLOTS ── */
+.slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.slot-btn{border:1.5px solid var(--border);border-radius:11px;padding:10px 8px;text-align:center;cursor:pointer;transition:all 0.2s;background:white;font-family:"DM Sans",sans-serif;}
+.slot-btn:hover:not(.unavail){border-color:rgba(232,98,10,0.4);}
+.slot-btn.selected{border-color:var(--orange);background:var(--orange-light);}
+.slot-btn.unavail{opacity:0.4;cursor:not-allowed;text-decoration:line-through;}
+.slot-time{font-size:13px;font-weight:600;color:var(--black);}
+.slot-avail{font-size:11px;color:var(--gray);margin-top:2px;}
+.slot-avail.few{color:#f59e0b;}
+
+/* ── FORM ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.form-label{font-size:13px;font-weight:600;color:var(--black);}
+.form-input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:11px;font-family:"DM Sans",sans-serif;font-size:14px;background:white;outline:none;transition:all 0.2s;color:var(--black);}
+.form-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,98,10,0.08);}
+.form-input.error{border-color:var(--red);}
+.form-error{font-size:12px;color:var(--red);margin-top:3px;display:none;}
+.form-error.show{display:block;}
+
+/* ── MOMO PANEL ── */
+#momo-panel{display:none;}
+.momo-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding:14px;background:linear-gradient(135deg,#FFCB05 0%,#FFB800 100%);border-radius:14px;}
+.momo-logo{width:44px;height:44px;background:white;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+.momo-header-text{flex:1;}
+.momo-header-text h4{font-family:"Syne",sans-serif;font-weight:700;font-size:15px;color:#1a1200;}
+.momo-header-text p{font-size:12px;color:#5a4400;}
+.momo-amount{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;color:#1a1200;}
+.pin-wrap{display:flex;gap:10px;justify-content:center;margin:20px 0;}
+.pin-digit{width:52px;height:60px;border:2px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;font-family:"Syne",sans-serif;transition:all 0.2s;background:white;}
+.pin-digit.filled{border-color:var(--orange);background:var(--orange-light);}
+.pin-digit.active{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,98,10,0.15);}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;margin:0 auto;}
+.num-btn{height:52px;border:1.5px solid var(--border);border-radius:12px;font-size:20px;font-weight:600;font-family:"Syne",sans-serif;cursor:pointer;background:white;transition:all 0.2s;color:var(--black);}
+.num-btn:hover{background:var(--gray-light);border-color:rgba(232,98,10,0.3);}
+.num-btn:active{transform:scale(0.95);}
+.num-btn.del{font-size:16px;}
+.num-btn.empty{visibility:hidden;}
+.momo-progress{height:6px;background:var(--gray-light);border-radius:3px;overflow:hidden;margin:16px 0 8px;}
+.momo-progress-bar{height:100%;background:linear-gradient(90deg,var(--orange),#FFCB05);border-radius:3px;width:0%;transition:width 0.4s ease;}
+.momo-status{font-size:13px;color:var(--gray);text-align:center;}
+
+/* ── SUCCESS SCREEN ── */
+#success-screen{display:none;text-align:center;padding:40px 20px;}
+.success-icon{width:80px;height:80px;background:var(--green-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+#success-screen h2{font-family:"Syne",sans-serif;font-size:26px;font-weight:800;margin-bottom:8px;}
+#success-screen p{color:var(--gray);font-size:15px;line-height:1.6;margin-bottom:24px;}
+.order-ref{display:inline-block;background:var(--gray-light);border-radius:10px;padding:10px 20px;font-family:"Syne",sans-serif;font-weight:700;font-size:14px;margin-bottom:28px;letter-spacing:0.05em;}
+.success-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* ── ORDER SUMMARY SIDEBAR ── */
+.sidebar{position:sticky;top:80px;}
+.summary-items{display:flex;flex-direction:column;gap:12px;margin-bottom:18px;}
+.sum-item{display:flex;align-items:center;gap:12px;}
+.sum-img{width:52px;height:52px;border-radius:10px;background:var(--gray-light);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden;position:relative;}
+.sum-img img{width:100%;height:100%;object-fit:cover;}
+.sum-qty{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--orange);border-radius:50%;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.sum-info{flex:1;min-width:0;}
+.sum-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sum-unit{font-size:12px;color:var(--gray);}
+.sum-price{font-family:"Syne",sans-serif;font-weight:700;font-size:14px;white-space:nowrap;}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.total-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;}
+.total-row.big{font-family:"Syne",sans-serif;font-weight:800;font-size:18px;}
+.total-row .green{color:var(--green);}
+.total-row .gray{color:var(--gray);}
+
+/* ── BUTTONS ── */
+.btn-orange{width:100%;padding:14px;background:var(--orange);color:white;border:none;border-radius:13px;font-family:"Syne",sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-orange:hover{background:var(--orange-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,98,10,0.3);}
+.btn-orange:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border:1.5px solid var(--border);border-radius:11px;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:500;cursor:pointer;background:white;text-decoration:none;color:var(--black);transition:all 0.2s;}
+.btn-ghost:hover{border-color:var(--orange);color:var(--orange);}
+.btn-green{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;background:var(--green);color:white;border:none;border-radius:11px;font-family:"Syne",sans-serif;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+.btn-green:hover{background:#095c34;transform:translateY(-1px);}
+
+/* ── DEPOSIT NOTE ── */
+.deposit-note{background:var(--orange-light);border:1px solid rgba(232,98,10,0.2);border-radius:12px;padding:14px;margin-bottom:18px;font-size:13px;color:var(--orange-dark);line-height:1.5;}
+.deposit-note strong{font-weight:700;}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.card{animation:fadeUp 0.4s ease both;}
+.card:nth-child(2){animation-delay:0.05s;}
+.card:nth-child(3){animation-delay:0.1s;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:720px){
+  .checkout-wrap{grid-template-columns:1fr;}
+  .sidebar{position:static;order:-1;}
+  .branch-grid{grid-template-columns:1fr;}
+  .slot-grid{grid-template-columns:repeat(2,1fr);}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <svg class="nav-logo-img" width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="Simba"><circle cx="18" cy="18" r="18" fill="#E8620A"/><text x="18" y="18" text-anchor="middle" dominant-baseline="central" fill="white" font-size="20" font-weight="bold" font-family="Syne,Arial,sans-serif">S</text></svg>
+    <div class="nav-logo-text">Simba <span>2.0</span></div>
+  </a>
+  <div class="nav-lang">
+    <button onclick="setLang('en')" id="btn-en">EN</button>
+    <button onclick="setLang('fr')" id="btn-fr">FR</button>
+    <button onclick="setLang('rw')" id="btn-rw">RW</button>
+  </div>
+  <a class="nav-back" href="shop.html">← <span data-t="back_to_shop">Back to Shop</span></a>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-bar">
+    <div class="prog-step done" id="prog1">
+      <div class="prog-num">✓</div>
+      <span data-t="prog_cart">Cart</span>
+    </div>
+    <div class="prog-sep done"></div>
+    <div class="prog-step active" id="prog2">
+      <div class="prog-num">2</div>
+      <span data-t="prog_details">Details</span>
+    </div>
+    <div class="prog-sep" id="sep2"></div>
+    <div class="prog-step inactive" id="prog3">
+      <div class="prog-num">3</div>
+      <span data-t="prog_payment">Payment</span>
+    </div>
+    <div class="prog-sep" id="sep3"></div>
+    <div class="prog-step inactive" id="prog4">
+      <div class="prog-num">4</div>
+      <span data-t="prog_confirm">Confirmed</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="checkout-wrap">
+
+  <!-- LEFT COLUMN -->
+  <div class="left-col">
+
+    <!-- STEP 1: BRANCH -->
+    <div class="card" id="card-branch">
+      <div class="card-title">
+        <div class="step-badge">1</div>
+        <span data-t="pick_branch">Pick-up Branch</span>
+      </div>
+      <div class="branch-grid" id="branch-grid">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- STEP 2: TIME SLOT -->
+    <div class="card" id="card-slot">
+      <div class="card-title">
+        <div class="step-badge">2</div>
+        <span data-t="pick_slot">Pick-up Time</span>
+      </div>
+      <div class="slot-grid" id="slot-grid">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- STEP 3: CONTACT INFO -->
+    <div class="card" id="card-info">
+      <div class="card-title">
+        <div class="step-badge">3</div>
+        <span data-t="your_info">Your Details</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" data-t="label_name">Full Name</label>
+          <input type="text" id="inp-name" class="form-input" data-ph="ph_name" placeholder="Kalisa Jean">
+          <span class="form-error" id="err-name" data-t="err_name">Please enter your name</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_phone">Phone (MoMo)</label>
+          <input type="tel" id="inp-phone" class="form-input" placeholder="078XXXXXXX" data-ph="ph_phone">
+          <span class="form-error" id="err-phone" data-t="err_phone">Enter a valid Rwandan number</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" data-t="label_notes">Order Notes <span style="color:var(--gray);font-weight:400" data-t="optional">(optional)</span></label>
+        <input type="text" id="inp-notes" class="form-input" data-ph="ph_notes" placeholder="Any special instructions...">
+      </div>
+
+      <div class="deposit-note" id="deposit-note">
+        💛 <strong data-t="deposit_title">50% Deposit Required:</strong>
+        <span data-t="deposit_desc"> Pay half now via MTN MoMo to confirm your slot. The remaining balance is due at pick-up.</span>
+      </div>
+
+      <button class="btn-orange" onclick="goToPayment()" id="btn-pay">
+        <span>💛</span> <span data-t="btn_pay_now">Pay Deposit via MTN MoMo</span>
+      </button>
+    </div>
+
+    <!-- STEP 4: MOMO PAYMENT -->
+    <div class="card" id="momo-panel">
+      <div class="card-title">
+        <div class="step-badge">4</div>
+        <span data-t="momo_title">MTN MoMo Payment</span>
+      </div>
+      <div class="momo-header">
+        <div class="momo-logo">💛</div>
+        <div class="momo-header-text">
+          <h4 data-t="momo_paying">Paying via MoMo</h4>
+          <p id="momo-phone-display">078XXXXXXX</p>
+        </div>
+        <div class="momo-amount" id="momo-amount-display">0 RWF</div>
+      </div>
+      <p style="text-align:center;font-size:13px;color:var(--gray);margin-bottom:16px;" data-t="enter_pin">Enter your 5-digit MoMo PIN</p>
+      <div class="pin-wrap" id="pin-display">
+        <div class="pin-digit" id="pd0">•</div>
+        <div class="pin-digit" id="pd1">•</div>
+        <div class="pin-digit" id="pd2">•</div>
+        <div class="pin-digit" id="pd3">•</div>
+        <div class="pin-digit" id="pd4">•</div>
+      </div>
+      <div class="numpad" id="numpad">
+        <!-- rendered by JS -->
+      </div>
+      <div class="momo-progress" id="momo-prog-wrap" style="display:none;">
+        <div class="momo-progress-bar" id="momo-prog-bar"></div>
+      </div>
+      <p class="momo-status" id="momo-status"></p>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="card" id="success-screen">
+      <div class="success-icon">✅</div>
+      <h2 data-t="success_title">Order Confirmed!</h2>
+      <p id="success-msg"></p>
+      <div class="order-ref" id="order-ref">SB-000000</div>
+      <div class="success-actions">
+        <a href="shop.html" class="btn-ghost">🛒 <span data-t="continue_shopping">Continue Shopping</span></a>
+        <a href="index.html" class="btn-green">🏠 <span data-t="go_home">Go Home</span></a>
+      </div>
+    </div>
+
+  </div><!-- /left-col -->
+
+  <!-- RIGHT: ORDER SUMMARY -->
+  <div class="sidebar">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px;">
+        <span data-t="order_summary">Order Summary</span>
+      </div>
+      <div class="summary-items" id="summary-items">
+        <!-- rendered by JS -->
+      </div>
+      <div class="divider"></div>
+      <div class="total-row"><span data-t="subtotal">Subtotal</span><span id="sum-subtotal">0 RWF</span></div>
+      <div class="total-row"><span data-t="pickup_fee" class="gray">Pick-up</span><span class="green" data-t="free">Free</span></div>
+      <div class="divider"></div>
+      <div class="total-row big"><span data-t="total">Total</span><span id="sum-total">0 RWF</span></div>
+      <div class="divider"></div>
+      <div class="total-row" style="font-size:13px;">
+        <span data-t="deposit_label">Deposit (50%)</span>
+        <span id="sum-deposit" style="color:var(--orange);font-weight:700;">0 RWF</span>
+      </div>
+      <div class="total-row" style="font-size:13px;">
+        <span data-t="balance_due" class="gray">Balance at pick-up</span>
+        <span id="sum-balance" class="gray">0 RWF</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /checkout-wrap -->
+
+<script src="js/services.js"></script>
+<script src="js/api.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/lang-switcher.js"></script>
+<script src="js/checkout.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
+

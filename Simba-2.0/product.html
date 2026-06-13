@@ -1,0 +1,680 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Product — Simba 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --orange:#E8620A;--orange-dark:#c04f06;--orange-light:#fff3eb;
+  --black:#0e0c0a;--white:#fffcf8;--gray:#6b6560;--gray-light:#f5f2ee;
+  --green:#0a6e3f;--green-light:#e8f5ee;--border:rgba(0,0,0,0.09);
+  --red:#dc2626;--red-light:#fef2f2;--yellow:#f59e0b;
+}
+html{scroll-behavior:smooth;}
+body{font-family:"DM Sans",sans-serif;background:var(--white);color:var(--black);min-height:100vh;}
+
+/* ── NAV ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,252,248,0.97);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(232,98,10,0.12);
+  padding:0 4%;display:flex;align-items:center;gap:10px;height:62px;
+}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;}
+.nav-logo-img{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--orange);flex-shrink:0;}
+.nav-logo-text{font-family:"Syne",sans-serif;font-weight:700;font-size:16px;color:var(--black);}
+.nav-logo-text span{color:var(--orange);}
+.search-wrap{flex:1;max-width:480px;position:relative;}
+.search-input{width:100%;padding:9px 42px 9px 14px;border:1.5px solid rgba(232,98,10,0.22);border-radius:11px;font-family:"DM Sans",sans-serif;font-size:14px;background:#fff;outline:none;transition:all 0.2s;color:var(--black);}
+.search-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,98,10,0.08);}
+.search-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:var(--orange);border:none;border-radius:8px;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.2s;}
+.search-btn:hover{background:var(--orange-dark);}
+.nav-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0;}
+.lang-grp{display:flex;gap:2px;}
+.lbtn{background:none;border:1.5px solid transparent;border-radius:14px;padding:3px 8px;font-size:11px;font-weight:600;color:var(--gray);cursor:pointer;transition:all 0.15s;font-family:"DM Sans",sans-serif;}
+.lbtn.active{border-color:var(--orange);color:var(--orange);}
+.cart-btn{position:relative;background:var(--orange);border:none;border-radius:9px;padding:7px 13px;color:#fff;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.2s;}
+.cart-btn:hover{background:var(--orange-dark);}
+.cart-badge{position:absolute;top:-6px;right:-6px;background:var(--black);color:#fff;border-radius:50%;width:17px;height:17px;font-size:9px;font-weight:700;display:none;align-items:center;justify-content:center;}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{padding:12px 4%;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gray);}
+.breadcrumb a{color:var(--orange);text-decoration:none;font-weight:500;}
+.breadcrumb a:hover{text-decoration:underline;}
+
+/* ── MAIN LAYOUT ── */
+.pdp-wrap{display:grid;grid-template-columns:480px 1fr;gap:40px;padding:0 4% 60px;max-width:1100px;margin:0 auto;}
+
+/* ── GALLERY ── */
+.gallery{position:relative;}
+.main-img-wrap{
+  background:var(--gray-light);border-radius:20px;
+  height:420px;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;border:1.5px solid var(--border);
+}
+.main-img-wrap img{max-height:100%;max-width:100%;object-fit:contain;padding:24px;transition:transform 0.3s;}
+.main-img-wrap:hover img{transform:scale(1.05);}
+.img-badge{position:absolute;top:14px;left:14px;background:var(--orange);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;}
+.img-oos{position:absolute;top:14px;right:14px;background:#dc2626;color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;}
+.thumb-strip{display:flex;gap:10px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.thumb-strip::-webkit-scrollbar{display:none;}
+.thumb{width:64px;height:64px;border-radius:10px;background:var(--gray-light);border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;overflow:hidden;}
+.thumb:hover,.thumb.active{border-color:var(--orange);}
+.thumb img{width:100%;height:100%;object-fit:cover;}
+
+/* ── PRODUCT INFO ── */
+.info{}
+.category-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;}
+.product-name{font-family:"Syne",sans-serif;font-size:28px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.product-meta{font-size:14px;color:var(--gray);margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap;}
+.product-meta span{display:flex;align-items:center;gap:4px;}
+
+.stock-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;padding:6px 14px;border-radius:20px;
+  margin-bottom:20px;
+}
+.stock-chip.in{background:var(--green-light);color:var(--green);}
+.stock-chip.out{background:var(--red-light);color:var(--red);}
+.stock-dot{width:8px;height:8px;border-radius:50%;}
+.stock-chip.in .stock-dot{background:var(--green);}
+.stock-chip.out .stock-dot{background:var(--red);}
+
+.price-block{margin-bottom:24px;}
+.price-main{font-family:"Syne",sans-serif;font-size:36px;font-weight:800;color:var(--orange);}
+.price-main small{font-size:14px;font-weight:400;color:var(--gray);}
+.price-note{font-size:12px;color:var(--gray);margin-top:4px;}
+
+/* ── QTY SELECTOR ── */
+.qty-section{margin-bottom:24px;}
+.qty-label{font-size:13px;font-weight:600;margin-bottom:8px;}
+.qty-row{display:flex;align-items:center;gap:12px;}
+.qty-control{
+  display:flex;align-items:center;gap:0;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;
+}
+.qty-btn{width:40px;height:40px;border:none;background:var(--gray-light);font-size:18px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.qty-btn:hover{background:var(--orange-light);color:var(--orange);}
+.qty-val{width:50px;text-align:center;font-size:16px;font-weight:700;font-family:"Syne",sans-serif;}
+
+/* ── ADD TO CART ── */
+.add-cart-btn{
+  width:100%;padding:15px;border-radius:14px;border:none;
+  background:var(--orange);color:white;font-family:"DM Sans",sans-serif;
+  font-size:16px;font-weight:700;cursor:pointer;transition:all 0.25s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 4px 20px rgba(232,98,10,0.3);
+}
+.add-cart-btn:hover{background:var(--orange-dark);transform:translateY(-2px);box-shadow:0 8px 30px rgba(232,98,10,0.4);}
+.add-cart-btn.added{background:var(--green);box-shadow:0 4px 20px rgba(10,110,63,0.3);}
+.add-cart-btn:disabled{background:#ddd;box-shadow:none;cursor:not-allowed;transform:none;}
+
+.wishlist-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;margin-top:10px;padding:12px;border-radius:12px;
+  border:1.5px solid var(--border);background:white;
+  font-family:"DM Sans",sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;color:var(--gray);
+}
+.wishlist-btn:hover{border-color:var(--red);color:var(--red);}
+.wishlist-btn.active{background:var(--red-light);border-color:var(--red);color:var(--red);}
+
+/* ── BRANCH INFO ── */
+.branch-info{
+  background:var(--gray-light);border-radius:14px;padding:16px;
+  margin-top:20px;
+}
+.branch-info-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--gray);margin-bottom:10px;}
+.branch-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.branch-pill{
+  font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;
+  background:white;border:1px solid var(--border);
+}
+.branch-pill.open{color:var(--green);background:var(--green-light);border-color:var(--green);}
+
+/* ── TABS ── */
+.pdp-tabs{margin-top:40px;border-top:1px solid var(--border);padding-top:20px;}
+.pdp-tab-btns{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.pdp-tab-btn{padding:10px 18px;border:none;background:none;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:500;color:var(--gray);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.pdp-tab-btn:hover{color:var(--orange);}
+.pdp-tab-btn.active{color:var(--orange);border-bottom-color:var(--orange);}
+.pdp-tab-content{font-size:14px;line-height:1.7;color:var(--gray);}
+.pdp-tab-content h4{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;color:var(--black);margin-bottom:8px;}
+.pdp-tab-content ul{margin-left:20px;margin-bottom:12px;}
+.pdp-tab-content li{margin-bottom:4px;}
+
+/* ── REVIEWS ── */
+.review-item{background:white;border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+.review-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.review-avatar{width:36px;height:36px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;}
+.review-name{font-weight:600;font-size:14px;}
+.review-stars{color:#FFCB05;font-size:14px;letter-spacing:1px;}
+.review-text{font-size:13px;color:var(--gray);line-height:1.6;}
+.review-date{font-size:11px;color:var(--gray);margin-top:6px;}
+.rating-overview{display:flex;align-items:center;gap:24px;background:var(--gray-light);border-radius:14px;padding:20px;margin-bottom:20px;}
+.rating-big{font-family:"Syne",sans-serif;font-size:48px;font-weight:800;color:var(--orange);}
+.rating-stars-big{font-size:22px;color:#FFCB05;letter-spacing:2px;}
+.rating-label{font-size:13px;color:var(--gray);margin-top:4px;}
+
+/* ── RELATED ── */
+.related{margin-top:60px;padding-top:40px;border-top:1px solid var(--border);}
+.related-title{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;margin-bottom:20px;}
+.related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.rel-card{background:white;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:all 0.2s;cursor:pointer;}
+.rel-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(232,98,10,0.12);}
+.rel-img{height:120px;background:var(--gray-light);display:flex;align-items:center;justify-content:center;font-size:36px;}
+.rel-img img{width:100%;height:100%;object-fit:cover;}
+.rel-body{padding:12px;}
+.rel-name{font-size:12px;font-weight:600;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.rel-price{font-family:"Syne",sans-serif;font-size:15px;font-weight:700;color:var(--orange);}
+.rel-cat{font-size:10px;color:var(--gray);margin-top:2px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:white;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:500;transform:translateY(80px);opacity:0;transition:all 0.3s;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.green{background:var(--green);}
+.toast.red{background:var(--red);}
+
+/* ── RELATED CARD ACTIONS ── */
+.rel-card-action{padding:0 10px 10px;}
+.rel-add-btn{width:100%;background:var(--orange);color:#fff;border:none;border-radius:8px;padding:8px 0;font-size:11px;font-weight:600;cursor:pointer;font-family:"DM Sans",sans-serif;transition:background 0.18s;}
+.rel-add-btn:hover{background:var(--orange-dark);}
+.rel-qty-ctrl{display:flex;align-items:stretch;width:100%;border-radius:8px;overflow:hidden;border:1.5px solid var(--orange);}
+.rel-qty-btn{flex:1;height:30px;background:white;border:none;color:var(--orange);font-size:16px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.rel-qty-btn:hover{background:var(--orange);color:white;}
+.rel-qty-num{flex:1.2;height:30px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:"Syne",sans-serif;border-left:1px solid rgba(232,98,10,0.3);border-right:1px solid rgba(232,98,10,0.3);}
+.rel-img img{width:100%;height:100%;object-fit:contain;padding:8px;}
+
+@media(max-width:800px){
+  .pdp-wrap{grid-template-columns:1fr;gap:24px;}
+  .main-img-wrap{height:300px;}
+  .related-grid{grid-template-columns:repeat(2,1fr);}
+  .breadcrumb{padding:10px 4%;}
+  .search-wrap{display:none;}
+}
+@media(max-width:480px){
+  .pdp-wrap{padding:0 3% 40px;}
+  .product-name{font-size:22px;}
+  .price-main{font-size:28px;}
+  .related-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">
+    <svg class="nav-logo-img" width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-label="Simba"><circle cx="18" cy="18" r="18" fill="#E8620A"/><text x="18" y="18" text-anchor="middle" dominant-baseline="central" fill="white" font-size="20" font-weight="bold" font-family="Syne,Arial,sans-serif">S</text></svg>
+    <span class="nav-logo-text">Simba <span>2.0</span></span>
+  </a>
+  <div class="search-wrap">
+    <input id="searchInput" class="search-input" type="text" placeholder="Search products..." autocomplete="off" onkeydown="if(event.key==='Enter')window.location='shop.html?q='+encodeURIComponent(this.value)"/>
+    <button class="search-btn" onclick="window.location='shop.html?q='+encodeURIComponent(document.getElementById('searchInput').value)">Search</button>
+  </div>
+  <div class="nav-right">
+    <div class="lang-grp">
+      <button class="lbtn" onclick="setLang('en')" id="btn-en">EN</button>
+      <button class="lbtn" onclick="setLang('fr')" id="btn-fr">FR</button>
+      <button class="lbtn" onclick="setLang('rw')" id="btn-rw">RW</button>
+    </div>
+    <button class="cart-btn" onclick="window.location='shop.html'">
+      <span data-t="cart">Cart</span>
+      <span id="cartBadge" class="cart-badge">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="index.html" data-t="nav_home">Home</a>
+  <span>›</span>
+  <a href="shop.html" data-t="nav_shop">Shop</a>
+  <span>›</span>
+  <span id="crumbCat">Category</span>
+  <span>›</span>
+  <span id="crumbName">Product</span>
+</div>
+
+<!-- MAIN -->
+<div class="pdp-wrap">
+  <!-- GALLERY -->
+  <div class="gallery">
+    <div class="main-img-wrap" id="mainImgWrap">
+      <img id="mainImg" src="" alt="Product"/>
+      <span class="img-badge" id="imgBadge" style="display:none;">NEW</span>
+      <span class="img-oos" id="imgOos" style="display:none;">OUT OF STOCK</span>
+    </div>
+    <div class="thumb-strip" id="thumbStrip"></div>
+  </div>
+
+  <!-- INFO -->
+  <div class="info">
+    <div class="category-label" id="productCategory">Category</div>
+    <h1 class="product-name" id="productName">Loading...</h1>
+    <div class="product-meta">
+      <span><span id="productUnit">Unit</span></span>
+      <span><span data-t="available_simba">Available at Simba</span></span>
+    </div>
+    <div class="stock-chip in" id="stockChip">
+      <div class="stock-dot"></div>
+      <span id="stockLabel">In Stock</span>
+    </div>
+    <div class="price-block">
+      <div class="price-main" id="productPrice">0 <small>RWF</small></div>
+      <div class="price-note" data-t="price_note">Price in Rwandan Francs (RWF)</div>
+    </div>
+    <div class="qty-section">
+      <div class="qty-label" data-t="quantity">Quantity</div>
+      <div class="qty-row">
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <div class="qty-val" id="qtyVal">1</div>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <span style="font-size:13px;color:var(--gray);" id="stockCount"></span>
+      </div>
+    </div>
+    <button class="add-cart-btn" id="addCartBtn" onclick="addToCart()">
+      <span data-t="add_to_cart">Add to Cart</span>
+    </button>
+    <button class="wishlist-btn" id="wishlistBtn" onclick="toggleWishlist()">
+      ♡ <span data-t="add_wishlist">Add to Wishlist</span>
+    </button>
+    <div class="branch-info">
+      <div class="branch-info-title" data-t="pickup_branches">Pick-up from these branches:</div>
+      <div class="branch-pills" id="branchPills"></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="pdp-tabs">
+      <div class="pdp-tab-btns">
+        <button class="pdp-tab-btn active" onclick="switchTab('desc',this)" data-t="tab_desc">Description</button>
+        <button class="pdp-tab-btn" onclick="switchTab('details',this)" data-t="tab_details">Details</button>
+        <button class="pdp-tab-btn" onclick="switchTab('reviews',this)" data-t="tab_reviews">Reviews</button>
+      </div>
+      <div id="tab-desc" class="pdp-tab-content">
+        <p id="prodDesc">Product description loading...</p>
+      </div>
+      <div id="tab-details" class="pdp-tab-content" style="display:none;">
+        <h4 data-t="product_details">Product Details</h4>
+        <ul>
+          <li><strong data-t="detail_name">Name</strong>: <span id="detail-name">-</span></li>
+          <li><strong data-t="detail_category">Category</strong>: <span id="detail-cat">-</span></li>
+          <li><strong data-t="detail_unit">Unit</strong>: <span id="detail-unit">-</span></li>
+          <li><strong data-t="detail_id">Product ID</strong>: <span id="detail-id">-</span></li>
+        </ul>
+      </div>
+      <div id="tab-reviews" class="pdp-tab-content" style="display:none;">
+        <div class="rating-overview">
+          <div style="text-align:center;">
+            <div class="rating-big" id="revAvg">4.5</div>
+            <div class="rating-stars-big" id="revStars">★★★★½</div>
+            <div class="rating-label" data-t="based_on">Based on <span id="revCount">12</span> reviews</div>
+          </div>
+        </div>
+        <div id="reviewsList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RELATED -->
+<div style="padding:0 4% 60px;max-width:1100px;margin:0 auto;">
+  <div class="related">
+    <div class="related-title" data-t="you_may_like">You May Also Like</div>
+    <div class="related-grid" id="relatedGrid"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="js/services.js"></script>
+<script src="js/api.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/lang-switcher.js"></script>
+<script>lucide.createIcons();</script>
+<script>
+// ── PRODUCT PAGE LOGIC ──
+var _localQty = 1;
+var _currentProduct = null;
+var _relProds = [];
+
+function _getCart(){ return JSON.parse(localStorage.getItem('simba_cart') || '[]'); }
+function _saveCart(c){
+  localStorage.setItem('simba_cart', JSON.stringify(c));
+  var n = c.reduce(function(s, i){ return s + i.qty; }, 0);
+  var b = document.getElementById('cartBadge');
+  if(b){ b.textContent = n; b.style.display = n > 0 ? 'flex' : 'none'; }
+}
+function _inCart(id){ var f = _getCart().find(function(i){ return i.id === id; }); return f ? f.qty : 0; }
+
+function changeQty(delta){
+  _localQty = Math.max(1, _localQty + delta);
+  var v = document.getElementById('qtyVal');
+  if(v) v.textContent = _localQty;
+}
+
+function addToCart(){
+  if(!_currentProduct || !_currentProduct.inStock) return;
+  var cart = _getCart();
+  var idx = cart.findIndex(function(i){ return i.id === _currentProduct.id; });
+  if(idx >= 0) cart[idx].qty += _localQty;
+  else cart.push({ id: _currentProduct.id, name: _currentProduct.name, price: _currentProduct.price, image: _currentProduct.image, category: _currentProduct.category, unit: _currentProduct.unit, qty: _localQty });
+  _saveCart(cart);
+  var btn = document.getElementById('addCartBtn');
+  if(btn){
+    btn.innerHTML = '✓ Added to Cart!';
+    btn.classList.add('added');
+    setTimeout(function(){ btn.innerHTML = '<span data-t="add_to_cart">Add to Cart</span>'; btn.classList.remove('added'); }, 1800);
+  }
+}
+
+function toggleWishlist(){
+  if(!_currentProduct) return;
+  var btn = document.getElementById('wishlistBtn');
+  var wish = JSON.parse(localStorage.getItem('simba_wishlist') || '[]');
+  var idx = wish.findIndex(function(p){ return p.id === _currentProduct.id; });
+  if(idx >= 0){
+    wish.splice(idx, 1);
+    if(btn){ btn.innerHTML = '♡ <span data-t="add_wishlist">Add to Wishlist</span>'; btn.classList.remove('active'); }
+  } else {
+    wish.push({ id: _currentProduct.id, name: _currentProduct.name, price: _currentProduct.price, image: _currentProduct.image, category: _currentProduct.category, unit: _currentProduct.unit });
+    if(btn){ btn.innerHTML = '♥ <span>In Wishlist</span>'; btn.classList.add('active'); }
+  }
+  localStorage.setItem('simba_wishlist', JSON.stringify(wish));
+}
+
+function switchTab(id, btn){
+  document.querySelectorAll('.pdp-tab-content').forEach(function(t){ t.style.display = 'none'; });
+  document.querySelectorAll('.pdp-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  var tab = document.getElementById('tab-' + id);
+  if(tab) tab.style.display = '';
+  if(btn) btn.classList.add('active');
+}
+
+function relAddItem(id){
+  var p = _relProds.find(function(x){ return x.id === id; });
+  if(!p) return;
+  var cart = _getCart();
+  var idx = cart.findIndex(function(i){ return i.id === id; });
+  if(idx >= 0) cart[idx].qty++;
+  else cart.push({ id: p.id, name: p.name, price: p.price, image: p.image, category: p.category, unit: p.unit, qty: 1 });
+  _saveCart(cart);
+  _renderRelAction(id);
+}
+
+function relSetQty(id, qty){
+  var cart = _getCart();
+  var idx = cart.findIndex(function(i){ return i.id === id; });
+  if(qty <= 0){ if(idx >= 0) cart.splice(idx, 1); }
+  else { if(idx >= 0) cart[idx].qty = qty; }
+  _saveCart(cart);
+  _renderRelAction(id);
+}
+
+function _renderRelAction(id){
+  var el = document.querySelector('.rel-card[data-rel-id="' + id + '"]');
+  if(!el) return;
+  var qty = _inCart(id);
+  var action = el.querySelector('.rel-card-action');
+  if(!action) return;
+  if(qty > 0){
+    action.innerHTML = '<div class="rel-qty-ctrl" onclick="event.stopPropagation()">'
+      + '<button class="rel-qty-btn" onclick="relSetQty(' + id + ',' + (qty - 1) + ')">−</button>'
+      + '<span class="rel-qty-num">' + qty + '</span>'
+      + '<button class="rel-qty-btn" onclick="relSetQty(' + id + ',' + (qty + 1) + ')">+</button>'
+      + '</div>';
+  } else {
+    action.innerHTML = '<button class="rel-add-btn" onclick="event.stopPropagation();relAddItem(' + id + ')">+ Add to Cart</button>';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async function(){
+  // Sync badge from localStorage
+  (function(){
+    var n = _getCart().reduce(function(s,i){ return s+i.qty; }, 0);
+    var b = document.getElementById('cartBadge');
+    if(b){ b.textContent = n; b.style.display = n > 0 ? 'flex' : 'none'; }
+  })();
+
+  var params = new URLSearchParams(location.search);
+  var pid = parseInt(params.get('id'));
+  if(!pid){ document.getElementById('productName').textContent = 'No product specified.'; return; }
+
+  var product = null;
+
+  // ── Try Django REST API ──
+  try {
+    var apiRes = await fetch('/api/v1/products/' + pid + '/');
+    if(apiRes.ok){
+      var d = await apiRes.json();
+      product = {
+        id: d.product_id || pid,
+        name: d.name,
+        price: parseFloat(d.price) || 0,
+        discountPrice: d.discount_price ? parseFloat(d.discount_price) : null,
+        discountPct: d.discount_percent || 0,
+        category: d.category ? d.category.name : (params.get('category') || ''),
+        unit: d.unit || '1 unit',
+        inStock: d.in_stock !== false,
+        image: d.image || '',
+        description: d.description || '',
+        apiReviews: d.reviews || [],
+        avgRating: parseFloat(d.average_rating) || 0,
+        reviewCount: d.review_count || 0
+      };
+      // Load related products from dedicated endpoint
+      try {
+        var relRes = await fetch('/api/v1/products/' + pid + '/related/');
+        if(relRes.ok){
+          _relProds = (await relRes.json() || []).map(function(p){
+            return { id: p.product_id || p.id, name: p.name, price: parseFloat(p.price)||0, category: p.category_name||'', unit: p.unit||'1 unit', inStock: p.in_stock!==false, image: p.image||'' };
+          }).filter(function(p){ return p.inStock; }).slice(0, 8);
+        }
+      } catch(e2) {}
+    }
+  } catch(e) {}
+
+  // ── Fallback: simba_products.json ──
+  if(!product){
+    try {
+      var jsonRes = await fetch('simba_products.json');
+      if(jsonRes.ok){
+        var data = await jsonRes.json();
+        var all = data.products || [];
+        var raw = all.find(function(p){ return p.id === pid; });
+        if(raw){
+          product = { id: raw.id, name: raw.name, price: raw.price, discountPrice: null, discountPct: 0, category: raw.category, unit: raw.unit||'1 unit', inStock: raw.inStock, image: raw.image||'', description: '', apiReviews: [], avgRating: 0, reviewCount: 0 };
+          _relProds = all.filter(function(p){ return p.category===raw.category && p.id!==raw.id && p.inStock; });
+          if(_relProds.length < 4){
+            var extra = all.filter(function(p){ return p.id!==raw.id && p.inStock && !_relProds.find(function(r){ return r.id===p.id; }); });
+            _relProds = _relProds.concat(extra);
+          }
+          _relProds = _relProds.slice(0, 8);
+        }
+      }
+    } catch(e2) {}
+  }
+
+  if(!product){
+    document.getElementById('productName').textContent = 'Product not found.';
+    document.title = 'Product not found — Simba 2.0';
+    return;
+  }
+
+  _currentProduct = product;
+  document.title = product.name + ' — Simba 2.0';
+
+  // Breadcrumb
+  var crumbCat = document.getElementById('crumbCat');
+  var crumbName = document.getElementById('crumbName');
+  if(crumbCat){
+    crumbCat.textContent = product.category;
+    crumbCat.style.cssText = 'color:var(--orange);cursor:pointer;font-weight:500;';
+    crumbCat.onclick = function(){ window.location = 'shop.html?category=' + encodeURIComponent(product.category); };
+  }
+  if(crumbName) crumbName.textContent = product.name;
+
+  // Main image
+  var mainImg = document.getElementById('mainImg');
+  if(mainImg){
+    mainImg.src = product.image || '';
+    mainImg.alt = product.name;
+    mainImg.onerror = function(){ this.style.display = 'none'; this.parentElement.style.background = '#ede9e4'; };
+  }
+
+  // Thumbnail strip
+  var thumbStrip = document.getElementById('thumbStrip');
+  if(thumbStrip && product.image){
+    thumbStrip.innerHTML = '<div class="thumb active"><img src="' + product.image + '" alt="" onerror="this.style.display=\'none\'"/></div>';
+  }
+
+  // OOS overlay
+  var imgOos = document.getElementById('imgOos');
+  if(imgOos) imgOos.style.display = product.inStock ? 'none' : 'block';
+
+  // Category, name, unit
+  var catEl = document.getElementById('productCategory');
+  if(catEl) catEl.textContent = product.category;
+
+  var nameEl = document.getElementById('productName');
+  if(nameEl) nameEl.textContent = product.name;
+
+  var unitEl = document.getElementById('productUnit');
+  if(unitEl) unitEl.textContent = product.unit;
+
+  // Stock chip
+  var stockChip = document.getElementById('stockChip');
+  var stockLabel = document.getElementById('stockLabel');
+  if(stockChip){
+    stockChip.className = 'stock-chip ' + (product.inStock ? 'in' : 'out');
+    if(stockLabel) stockLabel.textContent = product.inStock ? 'In Stock' : 'Out of Stock';
+  }
+
+  // Price — show discount if available
+  var priceEl = document.getElementById('productPrice');
+  if(priceEl){
+    if(product.discountPrice && product.discountPrice < product.price){
+      priceEl.innerHTML = Math.round(product.discountPrice).toLocaleString('en-US') + ' <small>RWF</small>'
+        + '<span style="font-size:14px;color:var(--gray);text-decoration:line-through;margin-left:10px;">'
+        + Math.round(product.price).toLocaleString('en-US') + ' RWF</span>';
+    } else {
+      priceEl.innerHTML = Math.round(product.price).toLocaleString('en-US') + ' <small>RWF</small>';
+    }
+  }
+
+  // Add to cart button — disable if OOS
+  var addBtn = document.getElementById('addCartBtn');
+  if(addBtn && !product.inStock){
+    addBtn.disabled = true;
+    addBtn.innerHTML = 'Out of Stock';
+  }
+
+  // Wishlist initial state
+  var wBtn = document.getElementById('wishlistBtn');
+  if(wBtn){
+    var wish = JSON.parse(localStorage.getItem('simba_wishlist') || '[]');
+    if(wish.find(function(p){ return p.id === product.id; })){
+      wBtn.innerHTML = '♥ <span>In Wishlist</span>';
+      wBtn.classList.add('active');
+    }
+  }
+
+  // Branch pills
+  var branchPills = document.getElementById('branchPills');
+  if(branchPills){
+    var branches = ['Kimironko','Kicukiro','Nyamirambo','Remera','Gisozi','Kacyiru','Butare','Musanze','Rubavu'];
+    branchPills.innerHTML = branches.map(function(b){ return '<span class="branch-pill open">' + b + '</span>'; }).join('');
+  }
+
+  // Description tab
+  var descEl = document.getElementById('prodDesc');
+  if(descEl){
+    descEl.textContent = product.description && product.description.trim()
+      ? product.description
+      : product.name + ' is a quality product available at all Simba supermarket branches across Rwanda. Sold as ' + product.unit + '. Browse our full ' + product.category + ' selection in store or online.';
+  }
+
+  // Details tab
+  ['detail-name','detail-cat','detail-unit','detail-id'].forEach(function(elId, i){
+    var el = document.getElementById(elId);
+    if(el) el.textContent = [product.name, product.category, product.unit, product.id][i];
+  });
+
+  // Reviews — use real data if available, otherwise synthetic
+  var avgRating = product.avgRating > 0 ? product.avgRating : (4.0 + (product.id % 10) / 20);
+  var rCount = product.reviewCount > 0 ? product.reviewCount : (8 + (product.id % 15));
+  var revAvgEl = document.getElementById('revAvg');
+  var revStarsEl = document.getElementById('revStars');
+  var revCountEl = document.getElementById('revCount');
+  var revListEl = document.getElementById('reviewsList');
+  if(revAvgEl) revAvgEl.textContent = avgRating.toFixed(1);
+  if(revStarsEl){
+    var full = Math.floor(avgRating), frac = avgRating - full >= 0.4 ? 1 : 0;
+    revStarsEl.textContent = '★'.repeat(full) + (frac ? '½' : '') + '☆'.repeat(5 - full - frac);
+  }
+  if(revCountEl) revCountEl.textContent = rCount;
+  if(revListEl){
+    if(product.apiReviews && product.apiReviews.length > 0){
+      revListEl.innerHTML = product.apiReviews.slice(0,5).map(function(r){
+        var stars = '★'.repeat(Math.max(0, Math.round(r.rating))) + '☆'.repeat(Math.max(0, 5 - Math.round(r.rating)));
+        var date = r.created_at ? new Date(r.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+        return '<div class="review-item"><div class="review-header">'
+          + '<div class="review-avatar">' + (r.user_avatar || (r.user_name||'?')[0]) + '</div>'
+          + '<div><div class="review-name">' + (r.user_name||'Customer') + '</div><div class="review-stars">' + stars + '</div></div>'
+          + '</div><div class="review-text">' + (r.comment||r.title||'') + '</div>'
+          + (date ? '<div class="review-date">' + date + '</div>' : '') + '</div>';
+      }).join('');
+    } else {
+      var rNames = ['Alice K.','Jean P.','Marie N.'];
+      var rTexts = ['Great quality, exactly what I expected!','Fast pickup at Kimironko branch. Very fresh.','Good value for money, will buy again.'];
+      revListEl.innerHTML = rNames.map(function(n,i){
+        return '<div class="review-item"><div class="review-header">'
+          + '<div class="review-avatar">' + n[0] + '</div>'
+          + '<div><div class="review-name">' + n + '</div><div class="review-stars">★★★★★</div></div>'
+          + '</div><div class="review-text">' + rTexts[i] + '</div>'
+          + '<div class="review-date">2 weeks ago</div></div>';
+      }).join('');
+    }
+  }
+
+  // Related products grid
+  var relGrid = document.getElementById('relatedGrid');
+  var relTitle = document.querySelector('.related-title');
+  if(relTitle) relTitle.textContent = 'More ' + product.category + ' Products';
+
+  if(relGrid){
+    if(_relProds.length){
+      relGrid.innerHTML = _relProds.map(function(p){
+        var qty = _inCart(p.id);
+        var actionHtml = qty > 0
+          ? '<div class="rel-qty-ctrl" onclick="event.stopPropagation()">'
+              + '<button class="rel-qty-btn" onclick="relSetQty(' + p.id + ',' + (qty-1) + ')">−</button>'
+              + '<span class="rel-qty-num">' + qty + '</span>'
+              + '<button class="rel-qty-btn" onclick="relSetQty(' + p.id + ',' + (qty+1) + ')">+</button>'
+              + '</div>'
+          : '<button class="rel-add-btn" onclick="event.stopPropagation();relAddItem(' + p.id + ')">+ Add to Cart</button>';
+        return '<div class="rel-card" data-rel-id="' + p.id + '" onclick="window.location=\'product.html?id=' + p.id + '&category=' + encodeURIComponent(p.category) + '\'">'
+          + '<div class="rel-img"><img src="' + p.image + '" alt="' + p.name.replace(/"/g,'&quot;') + '" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.style.background=\'#ede9e4\'"/></div>'
+          + '<div class="rel-body">'
+            + '<div class="rel-name">' + p.name + '</div>'
+            + '<div class="rel-price">' + Math.round(p.price).toLocaleString('en-US') + ' <small style="font-size:10px;font-weight:400;">RWF</small></div>'
+            + '<div class="rel-cat">' + p.category + '</div>'
+          + '</div>'
+          + '<div class="rel-card-action" onclick="event.stopPropagation()">' + actionHtml + '</div>'
+          + '</div>';
+      }).join('');
+    } else {
+      relGrid.innerHTML = '<p style="color:var(--gray);font-size:13px;grid-column:1/-1;padding:20px 0;">No similar products found.</p>';
+    }
+  }
+});
+</script>
+</body>
+</html>

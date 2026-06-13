@@ -1,0 +1,858 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sign In — Simba 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--orange:#E8620A;--orange-dark:#c04f06;--orange-light:#fff3eb;--black:#0e0c0a;--white:#fffcf8;--gray:#6b6560;--gray-light:#f5f2ee;--green:#0a6e3f;--red:#dc2626;}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);min-height:100vh;display:flex;flex-direction:column;}
+
+/* ── LAYOUT ── */
+.auth-wrap{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+
+/* ── LEFT PANEL ── */
+.auth-left{
+  background:var(--black);
+  padding:48px;
+  display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.auth-left::before{
+  content:'';position:absolute;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,98,10,0.18),transparent 70%);
+  top:-100px;right:-100px;pointer-events:none;
+}
+.auth-left::after{
+  content:'';position:absolute;
+  width:300px;height:300px;border-radius:50%;
+  background:radial-gradient(circle,rgba(232,98,10,0.1),transparent 70%);
+  bottom:-50px;left:-50px;pointer-events:none;
+}
+.auth-logo{display:flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:auto;}
+.auth-logo-img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:3px solid var(--orange);flex-shrink:0;}
+.auth-logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:white;}
+.auth-logo-text span{color:var(--orange);}
+.auth-left-content{position:relative;z-index:1;margin-top:auto;padding-bottom:24px;}
+.auth-left-content h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3vw,42px);font-weight:800;color:white;line-height:1.1;margin-bottom:16px;}
+.auth-left-content h2 em{font-style:normal;color:var(--orange);}
+.auth-left-content p{font-size:16px;color:#888;line-height:1.7;margin-bottom:32px;}
+.auth-feature{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.auth-feature-icon{width:36px;height:36px;background:rgba(232,98,10,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.auth-feature p{font-size:14px;color:#aaa;}
+.auth-feature strong{color:white;display:block;font-size:14px;margin-bottom:1px;}
+
+/* ── RIGHT PANEL ── */
+.auth-right{
+  padding:48px;
+  display:flex;flex-direction:column;
+  justify-content:center;
+  background:var(--white);
+  max-height:100vh;
+  overflow-y:auto;
+}
+.auth-right-inner{max-width:400px;width:100%;margin:0 auto;}
+
+/* ── TABS ── */
+.auth-tabs{display:flex;gap:4px;background:var(--gray-light);border-radius:14px;padding:4px;margin-bottom:32px;}
+.auth-tab{flex:1;padding:10px;border-radius:10px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--gray);cursor:pointer;transition:all 0.2s;}
+.auth-tab.active{background:white;color:var(--black);font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+
+/* ── FORM ── */
+.auth-form{display:none;}
+.auth-form.active{display:block;animation:fadeUp 0.3s ease;}
+.auth-form h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px;}
+.auth-form p.subtitle{font-size:14px;color:var(--gray);margin-bottom:28px;}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:13px;font-weight:600;color:var(--black);margin-bottom:6px;}
+.form-input{
+  width:100%;padding:12px 14px;
+  border:1.5px solid rgba(14,12,10,0.12);
+  border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:15px;
+  background:white;color:var(--black);
+  transition:all 0.2s;outline:none;
+}
+.form-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,98,10,0.1);}
+.form-input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,0.1);}
+.form-input.success{border-color:var(--green);box-shadow:0 0 0 3px rgba(10,110,63,0.1);}
+.input-wrap{position:relative;}
+.input-wrap .form-input{padding-right:44px;}
+.input-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--gray);}
+.form-error{font-size:12px;color:var(--red);margin-top:5px;display:none;}
+.form-error.show{display:block;}
+.form-hint{font-size:12px;color:var(--gray);margin-top:5px;}
+
+/* Password strength */
+.pw-strength{margin-top:8px;display:none;}
+.pw-strength.show{display:block;}
+.pw-bars{display:flex;gap:4px;margin-bottom:4px;}
+.pw-bar{height:3px;flex:1;border-radius:2px;background:var(--gray-light);transition:all 0.3s;}
+.pw-bar.weak{background:#dc2626;}
+.pw-bar.fair{background:#f59e0b;}
+.pw-bar.good{background:#10b981;}
+.pw-label{font-size:11px;color:var(--gray);}
+
+.btn-full{
+  width:100%;padding:13px;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;border:none;transition:all 0.25s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-orange-full{background:var(--orange);color:white;box-shadow:0 4px 16px rgba(232,98,10,0.25);}
+.btn-orange-full:hover{background:var(--orange-dark);transform:translateY(-1px);}
+.btn-orange-full:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;transform:none;}
+.btn-google{background:white;color:var(--black);border:1.5px solid rgba(14,12,10,0.12);margin-bottom:16px;}
+.btn-google:hover{border-color:rgba(14,12,10,0.25);box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(14,12,10,0.1);}
+.divider span{font-size:12px;color:var(--gray);white-space:nowrap;}
+
+.auth-switch{text-align:center;font-size:13px;color:var(--gray);margin-top:20px;}
+.auth-switch a{color:var(--orange);font-weight:600;text-decoration:none;cursor:pointer;}
+.auth-switch a:hover{text-decoration:underline;}
+
+.forgot-link{display:block;text-align:right;font-size:12px;color:var(--orange);text-decoration:none;margin-top:-8px;margin-bottom:16px;cursor:pointer;font-weight:500;}
+.forgot-link:hover{text-decoration:underline;}
+
+/* Alert box */
+.alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;align-items:flex-start;gap:8px;}
+.alert.show{display:flex;}
+.alert-success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+.alert-error{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+.alert-info{background:#eff6ff;border:1px solid #93c5fd;color:#1e40af;}
+
+/* Spinner */
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+.spinner.show{display:inline-block;}
+
+/* Lang switcher */
+.lang-bar{display:flex;justify-content:flex-end;gap:6px;margin-bottom:24px;}
+.lang-btn{background:none;border:1.5px solid transparent;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:500;color:var(--gray);cursor:pointer;transition:all 0.2s;}
+.lang-btn.active{border-color:var(--orange);color:var(--orange);}
+
+/* Reset form extras */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--gray);cursor:pointer;margin-bottom:20px;text-decoration:none;}
+.back-link:hover{color:var(--orange);}
+.reset-sent{text-align:center;padding:20px 0;display:none;}
+.reset-sent.show{display:block;}
+.reset-sent .big-icon{font-size:56px;margin-bottom:16px;}
+.reset-sent h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;}
+.reset-sent p{font-size:14px;color:var(--gray);line-height:1.6;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+@media(max-width:768px){
+  .auth-wrap{grid-template-columns:1fr;}
+  .auth-left{display:none;}
+  .auth-right{padding:32px 24px;max-height:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+
+  <!-- ── LEFT ─────────────────────────────────────────────── -->
+  <div class="auth-left">
+    <a href="index.html" class="auth-logo">
+      <svg class="auth-logo-img" width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" aria-label="Simba"><circle cx="22" cy="22" r="22" fill="#E8620A"/><text x="22" y="22" text-anchor="middle" dominant-baseline="central" fill="white" font-size="24" font-weight="bold" font-family="Syne,Arial,sans-serif">S</text></svg>
+      <span class="auth-logo-text">Simba <span>2.0</span></span>
+    </a>
+    <div class="auth-left-content">
+      <h2>Shop smarter,<br/>pick up <em>faster.</em></h2>
+      <p>Join thousands of Kigali families who order from Simba Supermarket online — pay with MoMo, pick up in 45 minutes.</p>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">&#x1F6D2;</div>
+        <div><strong data-t="feat1_title">552 Products</strong><p data-t="feat1_desc">Food, drinks, beauty, electronics and more</p></div>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">&#x1F4CD;</div>
+        <div><strong data-t="feat2_title">9 Kigali Branches</strong><p data-t="feat2_desc">Remera, Kimironko, Kacyiru and 6 more</p></div>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">&#x1F4F1;</div>
+        <div><strong data-t="feat3_title">MTN MoMo Payment</strong><p data-t="feat3_desc">Fast, secure, no cash needed</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT ─────────────────────────────────────────────── -->
+  <div class="auth-right">
+    <div class="auth-right-inner">
+
+      <div class="lang-bar">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" onclick="setLang('rw')">RW</button>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="showTab('login')" data-t="tab_login">Sign In</button>
+        <button class="auth-tab" onclick="showTab('register')" data-t="tab_register">Register</button>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div id="form-login" class="auth-form active">
+        <h2 data-t="login_title">Welcome back &#x1F44B;</h2>
+        <p class="subtitle" data-t="login_sub">Sign in to your Simba account</p>
+
+        <div class="alert alert-error" id="login-error">
+          <span>&#x26A0;&#xFE0F;</span><span id="login-error-msg"></span>
+        </div>
+
+        <button class="btn-full btn-google" onclick="handleGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.566 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          <span data-t="btn_google">Continue with Google</span>
+        </button>
+
+        <div class="divider"><span data-t="or">or sign in with email</span></div>
+
+        <div class="form-group">
+          <label class="form-label" data-t="label_email">Email address</label>
+          <input type="email" id="login-email" class="form-input" placeholder="you@example.com" data-ph="ph_email"/>
+          <span class="form-error" id="login-email-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="login-password" class="form-input" placeholder="••••••••" data-ph="ph_password"/>
+            <button class="input-toggle" onclick="togglePw('login-password',this)" type="button">&#x1F441;</button>
+          </div>
+          <span class="form-error" id="login-pw-err"></span>
+        </div>
+        <a class="forgot-link" onclick="showTab('forgot')" data-t="forgot_link">Forgot password?</a>
+
+        <button class="btn-full btn-orange-full" onclick="handleLogin()" id="login-btn">
+          <div class="spinner" id="login-spinner"></div>
+          <span data-t="btn_login">Sign In</span>
+        </button>
+
+        <p class="auth-switch" data-t="switch_to_register">
+          Don't have an account? <a onclick="showTab('register')">Register</a>
+        </p>
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div id="form-register" class="auth-form">
+        <h2 data-t="register_title">Create account &#x1F981;</h2>
+        <p class="subtitle" data-t="register_sub">Join Simba 2.0 — it's free</p>
+
+        <div class="alert alert-error" id="register-error">
+          <span>&#x26A0;&#xFE0F;</span><span id="register-error-msg"></span>
+        </div>
+        <div class="alert alert-success" id="register-success">
+          <span>&#x2705;</span><span data-t="register_success_msg">Account created! Redirecting to shop...</span>
+        </div>
+
+        <button class="btn-full btn-google" onclick="handleGoogle()" style="margin-bottom:16px;">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.566 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+          <span data-t="btn_google">Continue with Google</span>
+        </button>
+
+        <div class="divider"><span data-t="or_register">or register with email</span></div>
+
+        <div class="form-group">
+          <label class="form-label" data-t="label_fullname">Full Name</label>
+          <input type="text" id="reg-name" class="form-input" placeholder="Jean-Paul Habimana" data-ph="ph_name"/>
+          <span class="form-error" id="reg-name-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_email">Email address</label>
+          <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" data-ph="ph_email"/>
+          <span class="form-error" id="reg-email-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_phone">Phone (MTN MoMo)</label>
+          <input type="tel" id="reg-phone" class="form-input" placeholder="078 123 4567" data-ph="ph_phone"/>
+          <span class="form-error" id="reg-phone-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="reg-password" class="form-input" placeholder="At least 8 characters" data-ph="ph_pw_hint" oninput="checkPwStrength(this.value)"/>
+            <button class="input-toggle" onclick="togglePw('reg-password',this)" type="button">&#x1F441;</button>
+          </div>
+          <div class="pw-strength" id="pw-strength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
+              <div class="pw-bar" id="bar4"></div>
+            </div>
+            <span class="pw-label" id="pw-label"></span>
+          </div>
+          <span class="form-error" id="reg-pw-err"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-t="label_confirm_pw">Confirm Password</label>
+          <div class="input-wrap">
+            <input type="password" id="reg-confirm" class="form-input" placeholder="••••••••" data-ph="ph_password"/>
+            <button class="input-toggle" onclick="togglePw('reg-confirm',this)" type="button">&#x1F441;</button>
+          </div>
+          <span class="form-error" id="reg-confirm-err"></span>
+        </div>
+
+        <button class="btn-full btn-orange-full" onclick="handleRegister()" id="reg-btn">
+          <div class="spinner" id="reg-spinner"></div>
+          <span data-t="btn_register">Create Account</span>
+        </button>
+
+        <p class="auth-switch" data-t="switch_to_login">
+          Already have an account? <a onclick="showTab('login')">Sign In</a>
+        </p>
+      </div>
+
+      <!-- ── FORGOT PASSWORD FORM ── -->
+      <div id="form-forgot" class="auth-form">
+        <a class="back-link" onclick="showTab('login')">&#x2190; <span data-t="back_to_login">Back to Sign In</span></a>
+        <h2 data-t="forgot_title">Reset Password &#x1F511;</h2>
+        <p class="subtitle" data-t="forgot_sub">Enter your email and we'll send you a reset link.</p>
+
+        <div id="reset-form-inner">
+          <div class="alert alert-error" id="forgot-error">
+            <span>&#x26A0;&#xFE0F;</span><span id="forgot-error-msg"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-t="label_email">Email address</label>
+            <input type="email" id="forgot-email" class="form-input" placeholder="you@example.com" data-ph="ph_email"/>
+            <span class="form-error" id="forgot-email-err"></span>
+          </div>
+          <button class="btn-full btn-orange-full" onclick="handleForgot()" id="forgot-btn">
+            <div class="spinner" id="forgot-spinner"></div>
+            <span data-t="btn_send_reset">Send Reset Link</span>
+          </button>
+        </div>
+
+        <div class="reset-sent" id="reset-sent">
+          <div class="big-icon">&#x1F4EC;</div>
+          <h3 data-t="reset_sent_title">Check your inbox!</h3>
+          <p data-t="reset_sent_msg">We sent a password reset link to your email. Check your spam folder if you don't see it.</p>
+          <br/>
+          <a class="back-link" onclick="showTab('login')" style="justify-content:center;">&#x2190; <span data-t="back_to_login">Back to Sign In</span></a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script>
+// ── Translations ──────────────────────────────────────────────
+const T = {
+  en: {
+    tab_login:"Sign In", tab_register:"Register",
+    login_title:"Welcome back \u{1F44B}", login_sub:"Sign in to your Simba account",
+    register_title:"Create account \u{1F981}", register_sub:"Join Simba 2.0 — it's free",
+    forgot_title:"Reset Password \u{1F511}", forgot_sub:"Enter your email and we'll send you a reset link.",
+    feat1_title:"552 Products", feat1_desc:"Food, drinks, beauty, electronics and more",
+    feat2_title:"9 Kigali Branches", feat2_desc:"Remera, Kimironko, Kacyiru and 6 more",
+    feat3_title:"MTN MoMo Payment", feat3_desc:"Fast, secure, no cash needed",
+    label_email:"Email address", label_password:"Password", label_fullname:"Full Name",
+    label_phone:"Phone (MTN MoMo)", label_confirm_pw:"Confirm Password",
+    btn_google:"Continue with Google", btn_login:"Sign In", btn_register:"Create Account",
+    btn_send_reset:"Send Reset Link",
+    or:"or sign in with email", or_register:"or register with email",
+    forgot_link:"Forgot password?",
+    switch_to_register:"Don't have an account? <a onclick=\"showTab('register')\">Register</a>",
+    switch_to_login:"Already have an account? <a onclick=\"showTab('login')\">Sign In</a>",
+    back_to_login:"Back to Sign In",
+    reset_sent_title:"Check your inbox!",
+    reset_sent_msg:"We sent a password reset link to your email. Check your spam folder if you don't see it.",
+    register_success_msg:"Account created! Redirecting to shop...",
+    err_required:"This field is required",
+    err_email:"Please enter a valid email",
+    err_pw_short:"Password must be at least 8 characters",
+    err_pw_match:"Passwords do not match",
+    err_phone:"Enter a valid Rwandan phone number (e.g. 078 123 4567)",
+    err_login:"Invalid email or password. Please try again.",
+    err_email_exists:"An account with this email already exists.",
+    err_google:"Google sign-in is not available. Please use email/password.",
+    err_too_many:"Too many attempts. Please wait a few minutes and try again.",
+    err_user_disabled:"This account has been disabled. Contact support.",
+    ph_email:"you@example.com", ph_password:"••••••••",
+    ph_name:"Jean-Paul Habimana", ph_phone:"078 123 4567", ph_pw_hint:"At least 8 characters",
+    pw_weak:"Weak", pw_fair:"Fair", pw_good:"Good", pw_strong:"Strong",
+  },
+  fr: {
+    tab_login:"Connexion", tab_register:"S'inscrire",
+    login_title:"Bon retour \u{1F44B}", login_sub:"Connectez-vous à votre compte Simba",
+    register_title:"Créer un compte \u{1F981}", register_sub:"Rejoignez Simba 2.0 — c'est gratuit",
+    forgot_title:"Réinitialiser le mot de passe \u{1F511}", forgot_sub:"Entrez votre email et nous vous enverrons un lien.",
+    feat1_title:"552 Produits", feat1_desc:"Alimentation, boissons, beauté, électronique et plus",
+    feat2_title:"9 Agences à Kigali", feat2_desc:"Remera, Kimironko, Kacyiru et 6 autres",
+    feat3_title:"Paiement MTN MoMo", feat3_desc:"Rapide, sécurisé, sans espèces",
+    label_email:"Adresse email", label_password:"Mot de passe", label_fullname:"Nom complet",
+    label_phone:"Téléphone (MTN MoMo)", label_confirm_pw:"Confirmer le mot de passe",
+    btn_google:"Continuer avec Google", btn_login:"Se connecter", btn_register:"Créer un compte",
+    btn_send_reset:"Envoyer le lien",
+    or:"ou se connecter avec email", or_register:"ou s'inscrire avec email",
+    forgot_link:"Mot de passe oublié ?",
+    switch_to_register:"Pas de compte ? <a onclick=\"showTab('register')\">S'inscrire</a>",
+    switch_to_login:"Déjà un compte ? <a onclick=\"showTab('login')\">Se connecter</a>",
+    back_to_login:"Retour à la connexion",
+    reset_sent_title:"Vérifiez votre boîte mail !",
+    reset_sent_msg:"Nous avons envoyé un lien de réinitialisation à votre email.",
+    register_success_msg:"Compte créé ! Redirection vers la boutique...",
+    err_required:"Ce champ est obligatoire",
+    err_email:"Veuillez entrer un email valide",
+    err_pw_short:"Le mot de passe doit contenir au moins 8 caractères",
+    err_pw_match:"Les mots de passe ne correspondent pas",
+    err_phone:"Entrez un numéro rwandais valide (ex: 078 123 4567)",
+    err_login:"Email ou mot de passe invalide.",
+    err_email_exists:"Un compte avec cet email existe déjà.",
+    err_google:"Google non disponible. Utilisez email/mot de passe.",
+    err_too_many:"Trop de tentatives. Réessayez dans quelques minutes.",
+    err_user_disabled:"Ce compte a été désactivé. Contactez le support.",
+    ph_email:"vous@exemple.com", ph_password:"••••••••",
+    ph_name:"Jean-Paul Habimana", ph_phone:"078 123 4567", ph_pw_hint:"Au moins 8 caractères",
+    pw_weak:"Faible", pw_fair:"Moyen", pw_good:"Bon", pw_strong:"Fort",
+  },
+  rw: {
+    tab_login:"Injira", tab_register:"Iyandikishe",
+    login_title:"Murakaza neza \u{1F44B}", login_sub:"Injira muri konti yawe ya Simba",
+    register_title:"Fungura konti \u{1F981}", register_sub:"Injira muri Simba 2.0 — ubuntu",
+    forgot_title:"Hindura Ijambo Banga \u{1F511}", forgot_sub:"Injiza imeli yawe tukuhereze uhuza.",
+    feat1_title:"Ibicuruzwa 552", feat1_desc:"Ibiribwa, inzoga, isuku, ikoranabuhanga n'ibindi",
+    feat2_title:"Amashami 9 i Kigali", feat2_desc:"Remera, Kimironko, Kacyiru n'andi 6",
+    feat3_title:"Kwishyura na MTN MoMo", feat3_desc:"Byihuta, biramutse, nta faranga bikeneye",
+    label_email:"Imeli", label_password:"Ijambo banga", label_fullname:"Amazina yose",
+    label_phone:"Telefoni (MTN MoMo)", label_confirm_pw:"Emeza ijambo banga",
+    btn_google:"Komeza na Google", btn_login:"Injira", btn_register:"Fungura Konti",
+    btn_send_reset:"Ohereza Uhuza",
+    or:"cyangwa injira na imeli", or_register:"cyangwa iyandikishe na imeli",
+    forgot_link:"Wibagiwe ijambo banga?",
+    switch_to_register:"Nta konti? <a onclick=\"showTab('register')\">Iyandikishe</a>",
+    switch_to_login:"Usanzwe ufite konti? <a onclick=\"showTab('login')\">Injira</a>",
+    back_to_login:"Garuka Injira",
+    reset_sent_title:"Reba imeli yawe!",
+    reset_sent_msg:"Twohereje uhuza wo guhindura ijambo banga kuri imeli yawe.",
+    register_success_msg:"Konti yafunguwe! Ugiye ku isoko...",
+    err_required:"Iki gice ni ngombwa",
+    err_email:"Injiza imeli nyayo",
+    err_pw_short:"Ijambo banga rigomba kuba rifite inyuguti 8 nibura",
+    err_pw_match:"Amagambo banga ntahuye",
+    err_phone:"Injiza numero y'u Rwanda (urugero: 078 123 4567)",
+    err_login:"Imeli cyangwa ijambo banga ntabwo ari ryo.",
+    err_email_exists:"Konti ifite iyi imeli isanzwe ihari.",
+    err_google:"Google ntibasha. Koresha imeli n'ijambo banga.",
+    err_too_many:"Ugerageje kenshi. Gerageza nyuma y'iminota mike.",
+    err_user_disabled:"Konti yawe ihagaritswe. Twandikire.",
+    ph_email:"wowe@urugero.com", ph_password:"••••••••",
+    ph_name:"Jean-Paul Habimana", ph_phone:"078 123 4567", ph_pw_hint:"Inyuguti 8 nibura",
+    pw_weak:"Nke", pw_fair:"Hagati", pw_good:"Nziza", pw_strong:"Cyane",
+  }
+};
+
+let lang = localStorage.getItem('simba_lang') || 'en';
+
+function t(key){ return T[lang][key] || key; }
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('simba_lang', l);
+  applyT();
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l.toUpperCase()));
+}
+
+function applyT() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (T[lang][key] !== undefined) el.innerHTML = T[lang][key];
+  });
+  // Update placeholders
+  document.querySelectorAll('[data-ph]').forEach(el => {
+    const key = el.getAttribute('data-ph');
+    if (T[lang][key]) el.placeholder = T[lang][key];
+  });
+}
+
+// ── Tab switching ──────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  const form = document.getElementById('form-' + name);
+  form.classList.add('active');
+  if (name === 'login') document.querySelectorAll('.auth-tab')[0].classList.add('active');
+  if (name === 'register') document.querySelectorAll('.auth-tab')[1].classList.add('active');
+  clearErrors();
+  setTimeout(() => { const first = form.querySelector('input'); if (first) first.focus(); }, 60);
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function clearErrors() {
+  document.querySelectorAll('.form-error').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.alert').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.form-input').forEach(e => { e.classList.remove('error','success'); });
+}
+function setInputState(id, state) {
+  const el = document.getElementById(id);
+  if (el) { el.classList.remove('error','success'); if (state) el.classList.add(state); }
+}
+function setAlert(id, show) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('show', show);
+}
+function setLoading(btnId, spinnerId, loading) {
+  const btn = document.getElementById(btnId);
+  const sp = document.getElementById(spinnerId);
+  if (btn) btn.disabled = loading;
+  if (sp) sp.classList.toggle('show', loading);
+}
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '\u{1F648}'; }
+  else { inp.type = 'password'; btn.textContent = '\u{1F441}'; }
+}
+
+// ── Password strength ──────────────────────────────────────────
+function checkPwStrength(pw) {
+  const strength = document.getElementById('pw-strength');
+  const label = document.getElementById('pw-label');
+  const bars = [1,2,3,4].map(i => document.getElementById('bar'+i));
+  if (!pw) { strength.classList.remove('show'); return; }
+  strength.classList.add('show');
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  const levels = ['weak','fair','good','good'];
+  const labels = [t('pw_weak'), t('pw_fair'), t('pw_good'), t('pw_strong')];
+  bars.forEach((b, i) => {
+    b.className = 'pw-bar';
+    if (i < score) b.classList.add(levels[score-1]);
+  });
+  label.textContent = labels[score-1] || '';
+}
+
+// ── Validation ─────────────────────────────────────────────────
+function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+function validatePhone(phone) {
+  const c = phone.replace(/[\s\-\(\)]/g, '');
+  const n = c.startsWith('+250') ? '0' + c.slice(4) : c.startsWith('250') ? '0' + c.slice(3) : c;
+  return /^07\d{8}$/.test(n);
+}
+
+// ── LOGIN ──────────────────────────────────────────────────────
+function _loginError(msg) {
+  document.getElementById('login-error-msg').textContent = msg;
+  setAlert('login-error', true);
+  setInputState('login-email', 'error');
+  setInputState('login-password', 'error');
+  document.getElementById('login-password').value = '';
+  setLoading('login-btn', 'login-spinner', false);
+}
+
+async function handleLogin() {
+  clearErrors();
+  const email = document.getElementById('login-email').value.trim();
+  const pw    = document.getElementById('login-password').value;
+  let valid = true;
+
+  if (!email) { showError('login-email-err', t('err_required')); setInputState('login-email','error'); valid = false; }
+  else if (!validateEmail(email)) { showError('login-email-err', t('err_email')); setInputState('login-email','error'); valid = false; }
+  if (!pw) { showError('login-pw-err', t('err_required')); setInputState('login-password','error'); valid = false; }
+  if (!valid) return;
+
+  setLoading('login-btn','login-spinner',true);
+
+  // ── Firebase ──
+  if (window._fbReady) {
+    try {
+      const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
+      const idToken = await cred.user.getIdToken();
+      localStorage.setItem('simba_user', JSON.stringify({
+        name: cred.user.displayName || email.split('@')[0],
+        email: cred.user.email,
+        uid: cred.user.uid,
+        provider: 'firebase'
+      }));
+      localStorage.setItem('simba_token', idToken);
+      setInputState('login-email','success');
+      setInputState('login-password','success');
+      setLoading('login-btn','login-spinner',false);
+      setTimeout(() => window.location.href = REDIRECT_TARGET, 500);
+      return;
+    } catch(fbErr) {
+      const credErrors  = ['auth/user-not-found','auth/wrong-password','auth/invalid-credential','auth/invalid-email'];
+      const manyErrors  = ['auth/too-many-requests'];
+      const blockErrors = ['auth/user-disabled'];
+      if (credErrors.includes(fbErr.code))  { _loginError(t('err_login')); return; }
+      if (manyErrors.includes(fbErr.code))  { _loginError(t('err_too_many')); return; }
+      if (blockErrors.includes(fbErr.code)) { _loginError(t('err_user_disabled')); return; }
+      // Network / config error → fall through
+    }
+  }
+
+  // ── Django backend ──
+  try {
+    const res  = await fetch('http://127.0.0.1:8000/api/v1/auth/login/', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ login: email, password: pw })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('simba_token', data.access);
+      localStorage.setItem('simba_refresh', data.refresh);
+      try {
+        const me = await fetch('http://127.0.0.1:8000/api/v1/auth/me/', { headers:{ Authorization:'Bearer '+data.access } });
+        localStorage.setItem('simba_user', JSON.stringify(await me.json()));
+      } catch(e){}
+      setInputState('login-email','success');
+      setInputState('login-password','success');
+      setLoading('login-btn','login-spinner',false);
+      setTimeout(() => window.location.href = REDIRECT_TARGET, 500);
+      return;
+    }
+    _loginError(t('err_login'));
+  } catch(e) {
+    // ── Local fallback ──
+    const users = JSON.parse(localStorage.getItem('simba_users') || '[]');
+    const user  = users.find(u => u.email === email && u.password === btoa(pw));
+    if (user) {
+      localStorage.setItem('simba_user', JSON.stringify({ name:user.name, email:user.email, phone:user.phone }));
+      localStorage.setItem('simba_token', 'local_' + Date.now());
+      setInputState('login-email','success');
+      setInputState('login-password','success');
+      setLoading('login-btn','login-spinner',false);
+      setTimeout(() => window.location.href = REDIRECT_TARGET, 500);
+    } else {
+      _loginError(t('err_login'));
+    }
+  }
+}
+
+// ── REGISTER ───────────────────────────────────────────────────
+async function handleRegister() {
+  clearErrors();
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const pw = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-confirm').value;
+  let valid = true;
+
+  if (!name) { showError('reg-name-err', t('err_required')); setInputState('reg-name','error'); valid = false; }
+  if (!email) { showError('reg-email-err', t('err_required')); setInputState('reg-email','error'); valid = false; }
+  else if (!validateEmail(email)) { showError('reg-email-err', t('err_email')); setInputState('reg-email','error'); valid = false; }
+  if (!phone) { showError('reg-phone-err', t('err_required')); setInputState('reg-phone','error'); valid = false; }
+  else if (!validatePhone(phone)) { showError('reg-phone-err', t('err_phone')); setInputState('reg-phone','error'); valid = false; }
+  if (!pw) { showError('reg-pw-err', t('err_required')); setInputState('reg-password','error'); valid = false; }
+  else if (pw.length < 8) { showError('reg-pw-err', t('err_pw_short')); setInputState('reg-password','error'); valid = false; }
+  if (pw !== confirm) { showError('reg-confirm-err', t('err_pw_match')); setInputState('reg-confirm','error'); valid = false; }
+  if (!valid) return;
+
+  setLoading('reg-btn','reg-spinner',true);
+
+  // ── Firebase ──
+  if (window._fbReady) {
+    try {
+      const cred = await firebase.auth().createUserWithEmailAndPassword(email, pw);
+      await cred.user.updateProfile({ displayName: name });
+      const idToken = await cred.user.getIdToken();
+      localStorage.setItem('simba_user', JSON.stringify({ name, email, phone, uid: cred.user.uid, provider: 'firebase' }));
+      localStorage.setItem('simba_token', idToken);
+      setAlert('register-success', true);
+      setLoading('reg-btn','reg-spinner',false);
+      setTimeout(() => window.location.href = REDIRECT_TARGET, 1200);
+      return;
+    } catch(fbErr) {
+      if (fbErr.code === 'auth/email-already-in-use') {
+        document.getElementById('register-error-msg').textContent = t('err_email_exists');
+        setAlert('register-error', true);
+        setInputState('reg-email','error');
+        setLoading('reg-btn','reg-spinner',false);
+        return;
+      }
+      if (fbErr.code === 'auth/weak-password') {
+        showError('reg-pw-err', t('err_pw_short'));
+        setInputState('reg-password','error');
+        setLoading('reg-btn','reg-spinner',false);
+        return;
+      }
+      if (fbErr.code === 'auth/too-many-requests') {
+        document.getElementById('register-error-msg').textContent = t('err_too_many');
+        setAlert('register-error', true);
+        setLoading('reg-btn','reg-spinner',false);
+        return;
+      }
+      // Network / config error → fall through
+    }
+  }
+
+  // ── Django backend ──
+  const username = email.split('@')[0].replace(/[^a-zA-Z0-9]/g,'') + Math.floor(Math.random()*100);
+  try {
+    const res  = await fetch('http://127.0.0.1:8000/api/v1/auth/register/', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username, first_name: name, email, password: pw, phone })
+    });
+    const data = await res.json();
+    if (res.ok || res.status === 201) {
+      try {
+        const lr = await fetch('http://127.0.0.1:8000/api/v1/auth/login/', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ login: email, password: pw })
+        });
+        const ld = await lr.json();
+        if (lr.ok) {
+          localStorage.setItem('simba_token', ld.access);
+          localStorage.setItem('simba_user', JSON.stringify({ name, email, phone }));
+        }
+      } catch(e){}
+      setAlert('register-success', true);
+      setLoading('reg-btn','reg-spinner',false);
+      setTimeout(() => window.location.href = REDIRECT_TARGET, 1200);
+      return;
+    }
+    const msg = data.email ? t('err_email_exists') : (Object.values(data)[0] || t('err_login'));
+    document.getElementById('register-error-msg').textContent = Array.isArray(msg) ? msg[0] : msg;
+    setAlert('register-error', true);
+  } catch(e) {
+    // ── Local fallback ──
+    const users = JSON.parse(localStorage.getItem('simba_users') || '[]');
+    if (users.find(u => u.email === email)) {
+      document.getElementById('register-error-msg').textContent = t('err_email_exists');
+      setAlert('register-error', true);
+      setInputState('reg-email','error');
+    } else {
+      users.push({ name, email, phone, password: btoa(pw) });
+      localStorage.setItem('simba_users', JSON.stringify(users));
+      localStorage.setItem('simba_user', JSON.stringify({ name, email, phone }));
+      localStorage.setItem('simba_token', 'local_' + Date.now());
+      setAlert('register-success', true);
+      setLoading('reg-btn','reg-spinner',false);
+      setTimeout(() => window.location.href = REDIRECT_TARGET, 1200);
+      return;
+    }
+  } finally {
+    setLoading('reg-btn','reg-spinner',false);
+  }
+}
+
+// ── FORGOT PASSWORD ────────────────────────────────────────────
+async function handleForgot() {
+  clearErrors();
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { showError('forgot-email-err', t('err_required')); setInputState('forgot-email','error'); return; }
+  if (!validateEmail(email)) { showError('forgot-email-err', t('err_email')); setInputState('forgot-email','error'); return; }
+
+  setLoading('forgot-btn','forgot-spinner',true);
+
+  if (window._fbReady) {
+    try {
+      await firebase.auth().sendPasswordResetEmail(email);
+    } catch(e) {
+      // Always show success (don't reveal whether email exists)
+    }
+    setLoading('forgot-btn','forgot-spinner',false);
+    document.getElementById('reset-form-inner').style.display = 'none';
+    document.getElementById('reset-sent').classList.add('show');
+    return;
+  }
+
+  // Fallback: simulate
+  await new Promise(r => setTimeout(r, 1500));
+  setLoading('forgot-btn','forgot-spinner',false);
+  document.getElementById('reset-form-inner').style.display = 'none';
+  document.getElementById('reset-sent').classList.add('show');
+}
+
+// ── GOOGLE ────────────────────────────────────────────────────
+function _showGoogleError(msg) {
+  // Show in whichever panel is currently visible
+  const activeForm = document.querySelector('.auth-form.active');
+  const errWrap = activeForm && activeForm.querySelector('.alert-error');
+  const errMsg  = activeForm && activeForm.querySelector('.alert-error span:last-child');
+  if (errMsg)  errMsg.textContent = msg;
+  if (errWrap) errWrap.classList.add('show');
+}
+
+async function handleGoogle() {
+  if (!window._fbReady) {
+    _showGoogleError(t('err_google'));
+    return;
+  }
+  try {
+    sessionStorage.setItem('simba_redirect', REDIRECT_TARGET);
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result   = await firebase.auth().signInWithPopup(provider);
+    const idToken  = await result.user.getIdToken();
+    localStorage.setItem('simba_user', JSON.stringify({
+      name: result.user.displayName || result.user.email,
+      email: result.user.email,
+      uid: result.user.uid,
+      provider: 'google'
+    }));
+    localStorage.setItem('simba_token', idToken);
+    window.location.href = sessionStorage.getItem('simba_redirect') || REDIRECT_TARGET;
+  } catch(e) {
+    const ignored = ['auth/popup-closed-by-user','auth/cancelled-popup-request'];
+    if (!ignored.includes(e.code)) {
+      _showGoogleError(e.code === 'auth/too-many-requests' ? t('err_too_many') : (e.message || t('err_google')));
+    }
+  }
+}
+
+// ── Enter key support ──────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = document.querySelector('.auth-form.active');
+  if (!active) return;
+  if (active.id === 'form-login') handleLogin();
+  if (active.id === 'form-register') handleRegister();
+  if (active.id === 'form-forgot') handleForgot();
+});
+
+// ── Redirect target helper ─────────────────────────────────────
+function getRedirectTarget() {
+  const raw = new URLSearchParams(location.search).get('redirect');
+  if (!raw) return 'shop.html';
+  try {
+    const url = new URL(raw, location.origin);
+    if (url.origin === location.origin) return url.href;
+  } catch(e) {}
+  // Accept safe relative paths (no protocol-relative or external)
+  if (/^[a-zA-Z0-9_\-\.\/][a-zA-Z0-9_\-\.\/\?#&=%+]*$/.test(raw) && !raw.startsWith('//')) return raw;
+  return 'shop.html';
+}
+
+const REDIRECT_TARGET = getRedirectTarget();
+
+// ── Check URL params (e.g. ?tab=register) ─────────────────────
+const urlTab = new URLSearchParams(window.location.search).get('tab');
+if (urlTab) showTab(urlTab);
+
+// ── Init ───────────────────────────────────────────────────────
+applyT();
+document.querySelectorAll('.lang-btn').forEach(b => {
+  b.classList.toggle('active', b.textContent === lang.toUpperCase());
+});
+
+// If already logged in, skip the auth page entirely
+if (localStorage.getItem('simba_token') && !new URLSearchParams(location.search).has('logout')) {
+  window.location.replace(REDIRECT_TARGET);
+}
+lucide.createIcons();
+</script>
+<script src="js/services.js"></script>
+<script src="js/lang-switcher.js"></script>
+</body>
+</html>
+

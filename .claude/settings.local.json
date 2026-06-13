@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\LENOVO\\\\Downloads\\\\Simba-2.0-phase2\\\\Simba-2.0\" -Exclude \".venv\" -Recurse | Select-Object -Property FullName | ForEach-Object { $_.FullName } | Sort-Object)",
+      "Bash(find \"c:\\\\Users\\\\LENOVO\\\\Downloads\\\\Simba-2.0-phase2\\\\Simba-2.0\" -not -path \"*/\\\\.venv/*\" -type f | head -200)",
+      "Read(//c/Users/LENOVO/Downloads/Simba-2.0-phase2/Simba-2.0/*/.venv/**)",
+      "Bash(tree -L 3 \"c:\\\\Users\\\\LENOVO\\\\Downloads\\\\Simba-2.0-phase2\\\\Simba-2.0\" -I \".venv\" --charset ascii 2>/dev/null || find \"c:\\\\Users\\\\LENOVO\\\\Downloads\\\\Simba-2.0-phase2\\\\Simba-2.0\" -not -path \"*/\\\\.venv/*\" -type d | head -50)",
+      "Bash(find \"c:\\\\Users\\\\LENOVO\\\\Downloads\\\\Simba-2.0-phase2\\\\Simba-2.0\" -not -path \"*/\\\\.venv/*\" \\\\\\( -name \"*.html\" -o -name \"*.css\" -o -name \"*.js\" -o -name \"*.json\" -o -name \"*.yaml\" -o -name \"*.yml\" -o -name \"*.md\" -o -name \"*.txt\" -o -name \"*.py\" \\\\\\) -type f | sort)",
+      "WebFetch(domain:claude.ai)",
+      "Bash(Get-Content \"c:\\\\Users\\\\LENOVO\\\\Downloads\\\\Simba-2.0-phase2\\\\Simba-2.0\\\\Simba-2.0\\\\simba_products.json\" -TotalCount 60)",
+      "Bash(grep -v \"^[0-9]*:.*//\\\\|^[0-9]*:.*\\\\*\")",
+      "Bash(Select-Object Name)",
+      "PowerShell(cd \"C:\\\\Users\\\\LENOVO\\\\Downloads\\\\Simba-2.0-phase2\\\\Simba-2.0\"; powershell -ExecutionPolicy Bypass -File \"fix-mojibake.ps1\" 2>&1)"
+    ]
+  }
+}
